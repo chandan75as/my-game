@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cozy Farm</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c2c2c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: sans-serif;
+        }
+
+        /* Container background image hold karega */
+        .game-screen {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 2 / 3;
+            background-image: url('new.jpg');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid #444;
+            border-radius: 10px;
+        }
+
+        /* --- UI Bar Styling --- */
+        .top-ui {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .ui-item {
+            background-color: rgba(60, 40, 20, 0.8);
+            border: 2px solid #deb887;
+            border-radius: 20px;
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .ui-icon {
+            font-size: 16px;
+        }
+
+        /* --- All Clickable Elements Base CSS --- */
+        .house-link, .zoo-link, .pond-link, .factory-link {
+            position: absolute;
+            text-decoration: none;
+            display: block;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .house-link img, .zoo-link img, .pond-link img, .factory-link img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: filter 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Normal hover/active aur custom "active-glow" class ke liye yellow light */
+        .house-link:hover img, .house-link:active img, .house-link.active-glow img,
+        .zoo-link:hover img, .zoo-link:active img, .zoo-link.active-glow img,
+        .pond-link:hover img, .pond-link:active img, .pond-link.active-glow img,
+        .factory-link:hover img, .factory-link:active img, .factory-link.active-glow img {
+            filter: drop-shadow(0 0 25px rgba(255, 255, 0, 1)) brightness(1.15);
+            cursor: pointer;
+        }
+
+        /* ======================================================== */
+        /* YAHAN AAP APNI POSITIONS (TOP, LEFT, WIDTH) SET KAR LENA */
+        /* ======================================================== */
+        
+        .house-link {
+            top: 45%;     
+            left: 40%;    
+            width: 55%;   
+        }
+
+        .zoo-link {
+            top: 20%;      /* Apne hisaab se change karein */
+            left: 10%;     /* Apne hisaab se change karein */
+            width: 45%;    /* Apne hisaab se change karein */
+        }
+
+        .pond-link {
+            top: 15%;      /* Apne hisaab se change karein */
+            left: 55%;     /* Apne hisaab se change karein */
+            width: 40%;    /* Apne hisaab se change karein */
+        }
+
+        .factory-link {
+            top: 70%;      /* Apne hisaab se change karein */
+            left: 15%;     /* Apne hisaab se change karein */
+            width: 50%;    /* Apne hisaab se change karein */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-screen">
+        
+        <!-- Game Currency UI (Top Bar) -->
+        <div class="top-ui">
+            <div class="ui-item">
+                <span class="ui-icon">🪙</span>
+                <span class="ui-value">1250</span>
+            </div>
+            <div class="ui-item">
+                <span class="ui-icon">💎</span>
+                <span class="ui-value">45</span>
+            </div>
+            <div class="ui-item">
+                <span class="ui-icon">🍞</span>
+                <span class="ui-value">100/100</span>
+            </div>
+        </div>
+
+        <!-- Clickable House -->
+        <a href="house.html" class="house-link clickable-item">
+            <img src="farm.png" alt="Farm House">
+        </a>
+
+        <!-- Clickable Zoo -->
+        <a href="zoo.html" class="zoo-link clickable-item">
+            <img src="zoo.png" alt="Zoo">
+        </a>
+
+        <!-- Clickable Pond -->
+        <a href="pond.html" class="pond-link clickable-item">
+            <img src="pond.png" alt="Pond">
+        </a>
+
+        <!-- Clickable Factory -->
+        <a href="factory.html" class="factory-link clickable-item">
+            <img src="factory.png" alt="Factory">
+        </a>
+
+    </div>
+
+    <script>
+        // Maine yahan sabhi '.clickable-item' elements ko select kar liya hai
+        const allLinks = document.querySelectorAll('.clickable-item');
+
+        allLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // Turant page open hone se rokna
+                event.preventDefault(); 
+                
+                // Yellow light fix karne ke liye class add karna
+                this.classList.add('active-glow');
+                
+                // Jis page par jana hai uska link lena
+                const targetUrl = this.href;
+
+                // 0.5 second (500 ms) ka delay lagana
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                }, 500);
+            });
+        });
+
+        // Jab user browser ka "Back" button dabaye toh sabhi se yellow light reset ho jaye
+        window.addEventListener('pageshow', function(event) {
+            allLinks.forEach(link => {
+                link.classList.remove('active-glow');
+            });
+        });
+    </script>
+
+</body>
+</html>
