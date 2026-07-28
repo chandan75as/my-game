@@ -2,191 +2,274 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PREVENT ZOOMING & SCALING -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Cozy Farm</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #2c2c2c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: sans-serif;
-        }
+    /* --- APP-LIKE RESTRICTIONS --- */
+    * { 
+        box-sizing: border-box; 
+        user-select: none; 
+        -webkit-user-select: none; 
+        -webkit-touch-callout: none; 
+        touch-action: manipulation; 
+        -webkit-tap-highlight-color: transparent; /* FIX: Removes blue background on click */
+        outline: none; /* FIX: Removes focus borders */
+    }
 
-        /* Container background image hold karega */
-        .game-screen {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 2 / 3;
-            background-image: url('https://iili.io/CkeQYxV.jpg'); /* Yahan URL update kiya gaya hai */
-            background-size: cover;
-            background-position: center;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid #444;
-            border-radius: 10px;
-        }
+    body { 
+        margin: 0; 
+        padding: 0; 
+        background-color: #000; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        font-family: sans-serif; 
+        overflow: hidden; 
+    }
 
-        /* --- UI Bar Styling --- */
-        .top-ui {
-            position: absolute;
-            top: 15px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-evenly;
-            z-index: 10;
-            pointer-events: none;
-        }
+    /* MAIN WRAPPER */
+    .app-wrapper {
+        width: 100%;
+        max-width: 500px;
+        height: 100vh; 
+        display: flex;
+        flex-direction: column;
+        background-color: #2c2c2c;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    }
 
-        .ui-item {
-            background-color: rgba(60, 40, 20, 0.8);
-            border: 2px solid #deb887;
-            border-radius: 20px;
-            padding: 5px 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #fff;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            text-shadow: 1px 1px 2px #000;
-        }
+    /* --- GAME SCREEN (Map & Links) --- */
+    .game-screen { 
+        position: relative; 
+        width: 100%; 
+        aspect-ratio: 2 / 3; 
+        background-image: url('background.jpg'); 
+        background-size: 100% 100%; 
+        background-position: center; 
+        overflow: hidden; 
+        flex-shrink: 0; 
+        border-bottom: 3px solid #444; 
+    }
 
-        .ui-icon {
-            font-size: 16px;
-        }
+    /* --- TOP-LEFT: PROFILE UI --- */
+    .profile-ui {
+        position: absolute; 
+        top: 12px; 
+        left: 8px; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px;
+        background-color: rgba(0,0,0,0.7); 
+        padding: 4px 10px 4px 4px; 
+        border-radius: 30px; 
+        border: 2px solid #deb887; 
+        color: white; 
+        z-index: 15;
+    }
+    .profile-ui img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff; background: #555; object-fit: cover; color: transparent; }
+    .profile-info { display: flex; flex-direction: column; line-height: 1.1; }
+    .p-name { font-size: 11px; font-weight: bold; }
+    .p-lvl { font-size: 10px; color: #ffd700; font-weight: bold; }
 
-        /* --- All Clickable Elements Base CSS --- */
-        .house-link, .zoo-link, .pond-link, .factory-link {
-            position: absolute;
-            text-decoration: none;
-            display: block;
-            -webkit-tap-highlight-color: transparent;
-        }
+    /* --- TOP-RIGHT: RESOURCES UI --- */
+    .resources-ui {
+        position: absolute;
+        top: 12px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: rgba(0,0,0,0.7);
+        padding: 5px 10px;
+        border-radius: 20px;
+        border: 2px solid #deb887;
+        color: white;
+        z-index: 15;
+    }
+    .res-item { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
 
-        .house-link img, .zoo-link img, .pond-link img, .factory-link img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: filter 0.3s ease, transform 0.2s ease;
-        }
+    /* --- AAPKI ORIGINAL CLASSES AUR POSITIONS --- */
+    .clickable-item { position: absolute; text-decoration: none; display: block; z-index: 5; }
+    .clickable-item img { width: 100%; height: auto; display: block; transition: filter 0.3s ease, transform 0.2s ease; }
+    
+    .animalfarm-link { top: 20%; left: 0%; width: 46%; }
+    .gotocity-link   { top: 13%; left: 38%; width: 22%; }
+    .farm-link       { top: 54%; left: 17%; width: 55%; z-index: 4; } 
+    .factory-link    { top: 18.4%; left: 67%; width: 34%; }
+    .profile-link    { top: 42%; left: 1%; width: 30%; } 
+    .storage-link    { top: 20%; left: 19%; width: 64%; } 
+    .zoo-link        { top: 55%; left: 60%; width: 38%; }
+    .market-link     { top: 71%; left: 0%; width: 40%; }
+    .pond-link       { top: 74%; left: 38%; width: 58%; }
 
-        /* Normal hover/active aur custom "active-glow" class ke liye yellow light */
-        .house-link:hover img, .house-link:active img, .house-link.active-glow img,
-        .zoo-link:hover img, .zoo-link:active img, .zoo-link.active-glow img,
-        .pond-link:hover img, .pond-link:active img, .pond-link.active-glow img,
-        .factory-link:hover img, .factory-link:active img, .factory-link.active-glow img {
-            filter: drop-shadow(0 0 25px rgba(255, 255, 0, 1)) brightness(1.15);
-            cursor: pointer;
-        }
+    .clickable-item:hover img, .clickable-item:active img, .clickable-item.active-glow img { 
+        filter: drop-shadow(2px 0px 0px yellow) drop-shadow(-2px 0px 0px yellow) drop-shadow(0px 2px 0px yellow) drop-shadow(0px -2px 0px yellow) brightness(1.15); cursor: pointer;
+    }
 
-        /* ======================================================== */
-        /* YAHAN AAP APNI POSITIONS (TOP, LEFT, WIDTH) SET KAR LENA */
-        /* ======================================================== */
-        
-        .house-link {
-            top: 45%;     
-            left: 40%;    
-            width: 55%;   
-        }
+    /* --- FIXED 2-LINE YELLOW BOTTOM MENU --- */
+    .bottom-menu {
+        flex: 1; 
+        min-height: 0; 
+        background-color: #FFD700;
+        width: 100%;
+        display: flex;
+        flex-direction: column; 
+        justify-content: space-evenly; 
+        padding: 4px 6px; 
+        border-top: 5px solid #D4AC0D;
+        z-index: 20;
+    }
 
-        .zoo-link {
-            top: 20%;      /* Apne hisaab se change karein */
-            left: 10%;     /* Apne hisaab se change karein */
-            width: 45%;    /* Apne hisaab se change karein */
-        }
+    .menu-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
+    }
 
-        .pond-link {
-            top: 15%;      /* Apne hisaab se change karein */
-            left: 55%;     /* Apne hisaab se change karein */
-            width: 40%;    /* Apne hisaab se change karein */
-        }
+    .btn-3d {
+        border-radius: 10px; 
+        padding: 5px 2px; 
+        font-size: 11px; 
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+        gap: 2px; 
+        transition: all 0.1s ease-in-out;
+        width: 19%; 
+    }
+    .btn-3d span { font-size: 18px; } 
 
-        .factory-link {
-            top: 70%;      /* Apne hisaab se change karein */
-            left: 15%;     /* Apne hisaab se change karein */
-            width: 50%;    /* Apne hisaab se change karein */
-        }
+    .top-row .btn-3d {
+        width: 35%; 
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+    .top-row .btn-3d span { font-size: 24px; }
 
+    .btn-circle-3d {
+        background-color: #1E90FF;
+        border: 2px solid #0000CD;
+        border-bottom: 6px solid #0000CD;
+        border-radius: 50%; 
+        width: 62px; 
+        height: 62px;
+        font-size: 28px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.1s ease-in-out;
+        margin-top: -20px; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        z-index: 25;
+    }
+
+    /* BUTTON COLORS */
+    .c-shop   { background-color: #FF5252; border: 2px solid #C62828; border-bottom: 4px solid #C62828; }
+    .c-task   { background-color: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; }
+    .c-event  { background-color: #9C27B0; border: 2px solid #6A1B9A; border-bottom: 4px solid #6A1B9A; }
+    .c-set    { background-color: #78909C; border: 2px solid #455A64; border-bottom: 4px solid #455A64; }
+    .c-bag    { background-color: #8D6E63; border: 2px solid #4E342E; border-bottom: 4px solid #4E342E; }
+    .c-lead   { background-color: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; }
+    .c-news   { background-color: #26C6DA; border: 2px solid #00838F; border-bottom: 4px solid #00838F; }
+
+    .btn-3d:active, .btn-circle-3d:active {
+        transform: translateY(3px);
+        border-bottom-width: 2px !important;
+        margin-bottom: 2px; 
+        filter: brightness(0.9);
+    }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-    <div class="game-screen">
+    <div class="app-wrapper">
         
-        <!-- Game Currency UI (Top Bar) -->
-        <div class="top-ui">
-            <div class="ui-item">
-                <span class="ui-icon">🪙</span>
-                <span class="ui-value">1250</span>
+        <div class="game-screen">
+            <!-- Profile UI -->
+            <div class="profile-ui">
+                <img src="https://iili.io/CvagcQV.png" alt="User">
+                <div class="profile-info">
+                    <span class="p-name" id="player-name">Mr Chandu</span>
+                    <span class="p-lvl" id="player-level">⭐ Level 1</span>
+                </div>
             </div>
-            <div class="ui-item">
-                <span class="ui-icon">💎</span>
-                <span class="ui-value">45</span>
+
+            <!-- Resources UI -->
+            <div class="resources-ui">
+                <div class="res-item" id="coin-display">💰 50</div>
+                <div class="res-item" id="gem-display">💎 5</div>
+                <div class="res-item" id="wheat-display">🌾 1/5</div>
             </div>
-            <div class="ui-item">
-                <span class="ui-icon">🍞</span>
-                <span class="ui-value">100/100</span>
-            </div>
+
+            <a href="animalfarm.html" class="animalfarm-link clickable-item"><img src="animalfarm.png" alt="Animal Farm"></a>
+            <a href="gotocity.html" class="gotocity-link clickable-item"><img src="gotocity.png" alt="Go to City"></a>
+            <a href="farm.html" class="farm-link clickable-item"><img src="farm.png" alt="Farm House"></a>
+            <a href="factory.html" class="factory-link clickable-item"><img src="factory.png" alt="Factory"></a>
+            <a href="profile.html" class="profile-link clickable-item"><img src="house.png" alt="Profile"></a>
+            <a href="storage.html" class="storage-link clickable-item"><img src="storage.png" alt="Storage"></a>
+            <a href="zoo.html" class="zoo-link clickable-item"><img src="zoo.png" alt="Zoo"></a>
+            <a href="market.html" class="market-link clickable-item"><img src="market.png" alt="Market"></a>
+            <a href="pond.html" class="pond-link clickable-item"><img src="pond.png" alt="Pond"></a>
         </div>
 
-        <!-- Clickable House -->
-        <a href="house.html" class="house-link clickable-item">
-            <img src="farm.png" alt="Farm House">
-        </a>
-
-        <!-- Clickable Zoo -->
-        <a href="zoo.html" class="zoo-link clickable-item">
-            <img src="zoo.png" alt="Zoo">
-        </a>
-
-        <!-- Clickable Pond -->
-        <a href="pond.html" class="pond-link clickable-item">
-            <img src="pond.png" alt="Pond">
-        </a>
-
-        <!-- Clickable Factory -->
-        <a href="factory.html" class="factory-link clickable-item">
-            <img src="factory.png" alt="Factory">
-        </a>
-
+        <div class="bottom-menu">
+            <div class="menu-row top-row">
+                <button class="btn-3d c-shop nav-btn" data-url="soon"><span>🛍️</span>Shop</button>
+                <button class="btn-circle-3d nav-btn" data-url="index.html">🏠</button>
+                <button class="btn-3d c-task nav-btn" data-url="task.html"><span>📋</span>Task</button>
+            </div>
+            <div class="menu-row bottom-row">
+                <button class="btn-3d c-event nav-btn" data-url="soon"><span>🎪</span>Events</button>
+                <button class="btn-3d c-set nav-btn" data-url="soon"><span>⚙️</span>Setting</button>
+                <button class="btn-3d c-bag nav-btn" data-url="storage.html">🌐<span></span>guild</button>
+                <button class="btn-3d c-lead nav-btn" data-url="soon"><span>🏆</span>Ranks</button>
+                <button class="btn-3d c-news nav-btn" data-url="news.html"><span>📰</span>News</button>
+            </div>
+        </div>
     </div>
 
+    <!-- UI Interactions Script (Kept as it was) -->
     <script>
-        // Maine yahan sabhi '.clickable-item' elements ko select kar liya hai
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        
         const allLinks = document.querySelectorAll('.clickable-item');
-
         allLinks.forEach(link => {
             link.addEventListener('click', function(event) {
-                // Turant page open hone se rokna
-                event.preventDefault(); 
-                
-                // Yellow light fix karne ke liye class add karna
+                event.preventDefault();
                 this.classList.add('active-glow');
-                
-                // Jis page par jana hai uska link lena
                 const targetUrl = this.href;
-
-                // 0.5 second (500 ms) ka delay lagana
-                setTimeout(function() {
-                    window.location.href = targetUrl;
-                }, 500);
+                setTimeout(function() { window.location.href = targetUrl; }, 300);
             });
         });
-
-        // Jab user browser ka "Back" button dabaye toh sabhi se yellow light reset ho jaye
         window.addEventListener('pageshow', function(event) {
-            allLinks.forEach(link => {
-                link.classList.remove('active-glow');
+            allLinks.forEach(link => { link.classList.remove('active-glow'); });
+        });
+
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', function(event) {
+                event.preventDefault();
+                const targetUrl = this.getAttribute('data-url');
+                setTimeout(() => {
+                    if (targetUrl === 'soon') {
+                        alert('Coming Soon!');
+                    } else {
+                        window.location.href = targetUrl;
+                    }
+                }, 150);
             });
         });
     </script>
 
+    <!-- Brain JS for Future Logic (Yahan add kar diya) -->
+    <script src="brain.js"></script>
 </body>
 </html>
