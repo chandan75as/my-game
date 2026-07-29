@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Settings - My Cozy Farm</title>
+    <style>
+        /* =========================================
+           🎨 COZY UI STYLES (Matches Your Game)
+           ========================================= */
+        body {
+            margin: 0; padding: 0; background: #8bc34a; font-family: 'Comic Sans MS', cursive, sans-serif;
+            user-select: none; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        .top-bar {
+            width: 100%; background: #5d4037; color: white; padding: 15px; text-align: center;
+            font-size: 24px; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-bottom: 4px solid #3e2723;
+        }
+        .back-btn {
+            position: absolute; left: 15px; top: 15px; background: #ffb300; border: none; padding: 5px 15px;
+            border-radius: 8px; font-weight: bold; color: #3e2723; box-shadow: 0 4px 0 #ff8f00; cursor: pointer;
+        }
+        .back-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #ff8f00; }
+        
+        .settings-container {
+            background: #fff8e1; width: 90%; max-width: 400px; border-radius: 15px;
+            border: 4px solid #8d6e63; padding: 20px; margin-top: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .section-title { color: #5d4037; font-size: 18px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #d7ccc8; padding-bottom: 5px; }
+        
+        /* Avatars */
+        .avatar-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .avatar-img { 
+            width: 60px; height: 60px; border-radius: 50%; border: 3px solid #ccc; 
+            cursor: pointer; object-fit: cover; background: white; transition: 0.2s;
+        }
+        .avatar-img.selected { border-color: #4CAF50; transform: scale(1.1); box-shadow: 0 0 10px #4CAF50; }
+        .custom-avatar-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: 3px dashed #8d6e63;
+            background: #ffe082; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;
+        }
+
+        /* Inputs & Buttons */
+        input[type="text"] {
+            width: 90%; padding: 10px; border: 2px solid #8d6e63; border-radius: 8px;
+            font-family: inherit; font-size: 16px; margin-bottom: 10px; text-align: center;
+        }
+        .btn-3d {
+            width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold;
+            font-size: 16px; cursor: pointer; margin-bottom: 15px; color: white;
+            font-family: inherit; transition: 0.1s;
+        }
+        .btn-green { background: #66bb6a; box-shadow: 0 5px 0 #388e3c; }
+        .btn-green:active { transform: translateY(5px); box-shadow: 0 0 0 #388e3c; }
+        .btn-gold { background: #ffca28; color: #3e2723; box-shadow: 0 5px 0 #ff8f00; }
+        .btn-gold:active { transform: translateY(5px); box-shadow: 0 0 0 #ff8f00; }
+        .btn-red { background: #ef5350; box-shadow: 0 5px 0 #c62828; margin-top: 20px; }
+        .btn-red:active { transform: translateY(5px); box-shadow: 0 0 0 #c62828; }
+        
+        .currency-display { text-align: center; font-weight: bold; color: #1565c0; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button class="back-btn" onclick="window.location.href='farm.html'">🏠 Back</button>
+        ⚙️ Settings
+    </div>
+
+    <div class="settings-container">
+        <div class="currency-display" id="settings-gem-display">💎 Gems: Loading...</div>
+
+        <!-- PROFILE PICTURE SECTION -->
+        <div class="section-title">🖼️ Choose Profile Picture</div>
+        <div class="avatar-grid" id="avatar-container">
+            <!-- Avatars will be injected here via JS -->
+        </div>
+
+        <!-- NAME CHANGE SECTION -->
+        <div class="section-title">✏️ Change Name</div>
+        <input type="text" id="new-name-input" placeholder="Enter new name..." maxlength="12">
+        <button id="change-name-btn" class="btn-3d btn-green" onclick="attemptNameChange()">Change Name (Free)</button>
+        <div style="font-size: 12px; color: #d32f2f; text-align: center;">Note: 1st change is Free. After that, it costs 150 💎.</div>
+
+        <!-- LOGOUT SECTION -->
+        <button class="btn-3d btn-red" onclick="logoutAccount()">🚪 Logout</button>
+    </div>
+
+    <!-- BRAIN.JS CONNECTION -->
+    <script type="module" src="brain.js"></script>
+
+    <!-- SETTINGS LOGIC -->
+    <script type="module">
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        const AVATARS = [
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer1',
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer2',
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer3',
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer4'
+        ];
+
+        // Wait for GameData to load from brain.js
+        let waitInterval = setInterval(() => {
+            if (window.GameData) {
+                clearInterval(waitInterval);
+                initSettingsUI();
+            }
+        }, 100);
+
+        function initSettingsUI() {
+            // Setup Name Button
+            const nameBtn = document.getElementById('change-name-btn');
+            if (window.GameData.hasChangedName) {
+                nameBtn.innerHTML = "Change Name (150 💎)";
+                nameBtn.className = "btn-3d btn-gold";
+            } else {
+                nameBtn.innerHTML = "Change Name (Free)";
+                nameBtn.className = "btn-3d btn-green";
+            }
+
+            // Show Gems
+            document.getElementById('settings-gem-display').innerText = `💎 Gems: ${window.GameData.gems}`;
+            document.getElementById('new-name-input').value = window.GameData.playerName;
+
+            // Render Avatars
+            renderAvatars();
+        }
+
+        function renderAvatars() {
+            const container = document.getElementById('avatar-container');
+            container.innerHTML = '';
+            
+            let currentPic = window.GameData.profilePic || AVATARS[0];
+
+            AVATARS.forEach((url, index) => {
+                let isSelected = currentPic === url ? 'selected' : '';
+                container.innerHTML += `<img src="${url}" class="avatar-img ${isSelected}" onclick="window.selectAvatar('${url}')">`;
+            });
+
+            // If using a custom pic not in the default list
+            if (!AVATARS.includes(currentPic)) {
+                container.innerHTML += `<img src="${currentPic}" class="avatar-img selected" onclick="window.selectAvatar('${currentPic}')">`;
+            }
+
+            container.innerHTML += `<div class="custom-avatar-btn" onclick="window.setCustomAvatar()">➕</div>`;
+        }
+
+        // --- GLOBAL FUNCTIONS ---
+        window.selectAvatar = function(url) {
+            window.GameData.profilePic = url;
+            window.saveGameData();
+            renderAvatars(); // Re-render to show selection box
+            if(window.customAlert) window.customAlert("Awesome! 🎨", "Profile picture updated successfully!", "success");
+        };
+
+        window.setCustomAvatar = function() {
+            let url = prompt("Paste direct Image URL (e.g. ending in .png/.jpg):");
+            if (url && url.length > 5) {
+                window.selectAvatar(url);
+            }
+        };
+
+        window.attemptNameChange = function() {
+            let newName = document.getElementById('new-name-input').value.trim();
+            if (newName.length < 3) {
+                if(window.customAlert) window.customAlert("Error", "Name must be at least 3 characters long!", "error");
+                else alert("Name must be at least 3 characters long!");
+                return;
+            }
+
+            if (newName === window.GameData.playerName) return;
+
+            if (!window.GameData.hasChangedName) {
+                // First time FREE
+                window.GameData.playerName = newName;
+                window.GameData.hasChangedName = true;
+                window.saveGameData();
+                if(window.customAlert) window.customAlert("Success! 🎉", "Name changed successfully for free!", "success");
+                initSettingsUI(); // Refresh UI
+            } 
+            else {
+                // Costs 150 Gems
+                if (window.GameData.gems >= 150) {
+                    let confirmPay = confirm(`Are you sure you want to pay 150 💎 to change name to "${newName}"?`);
+                    if(confirmPay) {
+                        window.GameData.gems -= 150;
+                        window.GameData.playerName = newName;
+                        window.saveGameData();
+                        if(window.customAlert) window.customAlert("Success! 💎", "Name changed successfully!", "success");
+                        initSettingsUI(); // Refresh UI
+                    }
+                } else {
+                    if(window.customAlert) window.customAlert("Not Enough Gems", "You need 150 💎 to change your name.", "error");
+                    else alert("Not enough gems!");
+                }
+            }
+        };
+
+        window.logoutAccount = function() {
+            let conf = confirm("Are you sure you want to logout?");
+            if(conf) {
+                const auth = getAuth();
+                signOut(auth).then(() => {
+                    localStorage.removeItem('cozyFarm_PlayerId'); // Clear local ID tag
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    alert("Error logging out: " + error.message);
+                });
+            }
+        };
+    </script>
+</body>
+</html>
