@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Player Profile - My Cozy Farm</title>
+    <style>
+    /* --- APP-LIKE RESTRICTIONS --- */
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important;}
+    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; overflow: hidden; }
+
+    /* --- GAME BACKGROUND WITH DARK OVERLAY --- */
+    .app-wrapper { width: 100%; max-width: 500px; height: 100vh; display: flex; flex-direction: column; background: url('background.jpg') center/100% 100%; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
+    .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.65); z-index: 1; backdrop-filter: blur(2px); }
+
+    /* --- 3D WOODEN PROFILE PANEL --- */
+    .profile-panel { position: relative; z-index: 2; margin: 20px; flex: 1; background: #8D6E63; border: 4px solid #4E342E; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.4); }
+    
+    /* Header */
+    .header { background: #5D4037; border-bottom: 4px solid #4E342E; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+    .header h2 { margin: 0; font-size: 18px; color: #FFECB3; text-shadow: 2px 2px 3px #000; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-red-back { background: #E53935; border: 2px solid #B71C1C; border-bottom: 4px solid #B71C1C; padding: 6px 12px; font-size: 12px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; transition: all 0.1s; }
+    .btn-red-back:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; }
+    
+    /* Scrollable Content Area */
+    .content { overflow-y: auto; padding: 15px; flex: 1; }
+    .content::-webkit-scrollbar { width: 6px; }
+    .content::-webkit-scrollbar-thumb { background: #4E342E; border-radius: 5px; }
+
+    /* --- 3D BUTTONS --- */
+    .btn-3d { border-radius: 8px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.1s; outline: none; border: none; padding: 8px 12px; font-size: 12px; }
+    .btn-3d:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; filter: brightness(0.9); }
+    .btn-blue { background: #1E90FF; border: 2px solid #0000CD; border-bottom: 4px solid #0000CD; padding: 6px 10px; font-size: 14px; }
+    .btn-green { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; flex: 1; }
+    .btn-gold { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; flex: 1; }
+
+    /* --- PLAYER INFO CARD --- */
+    .info-card { background: #6D4C41; border: 2px solid #4E342E; border-radius: 12px; padding: 12px; display: flex; gap: 15px; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); margin-bottom: 15px; }
+    .avatar-wrap { position: relative; width: 75px; height: 75px; background: #A1887F; border: 3px solid #FFD700; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+    .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .lvl-badge { position: absolute; bottom: -8px; background: #FF5252; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 2px solid #fff; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .p-details { flex: 1; line-height: 1.3; }
+    .p-name { font-size: 18px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; margin: 0; display: flex; align-items: center; gap: 5px; }
+    .vip-tag { background: linear-gradient(90deg, #FFD700, #FFA000); color: #000; font-size: 9px; padding: 2px 6px; border-radius: 4px; text-shadow: none; border: 1px solid #FFF; }
+    .p-id { font-size: 11px; color: #FFECB3; font-weight: bold; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+    .copy-id { background: #3E2723; border: 1px solid #795548; color: #fff; padding: 2px 5px; border-radius: 4px; font-size: 9px; cursor: pointer; transition: transform 0.1s;}
+    .copy-id:active { transform: scale(0.9); }
+    .p-guild { font-size: 12px; color: #A5D6A7; font-weight: bold; margin-top: 2px; }
+
+    /* --- XP BAR --- */
+    .xp-wrap { margin-bottom: 15px; }
+    .xp-txt { display: flex; justify-content: space-between; font-size: 11px; color: #FFD700; font-weight: 900; margin-bottom: 4px; text-shadow: 1px 1px 1px #000; }
+    .xp-bg { height: 16px; background: #3E2723; border: 2px solid #271610; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.7); }
+    .xp-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 5px; border-right: 2px solid #fff; box-shadow: 0 0 10px #4CAF50; transition: width 0.5s; }
+
+    /* Action Buttons Row */
+    .action-row { display: flex; gap: 10px; margin-bottom: 15px; }
+
+    /* --- COMMON SECTION STYLE --- */
+    .sec-box { background: rgba(0,0,0,0.25); border: 2px solid #5D4037; border-radius: 12px; padding: 12px; margin-bottom: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+    .sec-title { color: #FFD700; font-size: 13px; text-transform: uppercase; text-align: center; margin: 0 0 10px 0; text-shadow: 1px 1px 2px #000; border-bottom: 1px dashed #795548; padding-bottom: 5px; font-weight: 900; }
+
+    /* Stats Grid */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { background: #4E342E; border: 2px solid #3E2723; border-radius: 8px; padding: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .s-val { color: #FFF; font-weight: 900; font-size: 16px; margin: 2px 0; text-shadow: 1px 1px 2px #000; }
+    .s-lbl { color: #BCAAA4; font-size: 10px; font-weight: bold; }
+
+    /* Inventory Grid */
+    .inv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .inv-item { background: #3E2723; border: 2px solid #271610; border-radius: 8px; text-align: center; padding: 6px 0; position: relative; font-size: 22px; }
+    .inv-qty { position: absolute; bottom: -6px; right: -6px; background: #FF5252; color: white; font-size: 9px; padding: 1px 5px; border-radius: 8px; border: 1px solid #fff; font-weight: 900; }
+
+    /* Badges Scroll */
+    .badges { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+    .badges::-webkit-scrollbar { height: 4px; }
+    .badges::-webkit-scrollbar-thumb { background: #FFD700; border-radius: 5px; }
+    .badge { flex: 0 0 65px; background: linear-gradient(135deg, #FFD700, #F57F17); border: 2px solid #FFF; border-radius: 10px; padding: 8px 2px; text-align: center; box-shadow: 0 3px 5px rgba(0,0,0,0.4); }
+    .b-icon { font-size: 24px; }
+    .b-txt { font-size: 9px; font-weight: 900; color: #3E2723; margin-top: 4px; line-height: 1.1; }
+
+    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
+    .modal-overlay.show .alert-box { transform: scale(1); }
+    .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
+    .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
+    
+    .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
+    .alert-box.success .alert-title { color: #C8E6C9; }
+    .alert-box.error { border-color: #E53935; background: #C62828; }
+    .alert-box.error .alert-title { color: #FFCDD2; }
+    .btn-gold-alert { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; font-size: 14px; padding: 10px; font-weight: 900; border-radius: 8px; cursor: pointer;}
+    .btn-gold-alert:active { transform: translateY(2px); border-bottom-width: 2px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="app-wrapper">
+        <div class="bg-overlay"></div> <!-- Blur Dark Overlay -->
+
+        <div class="profile-panel">
+            
+            <!-- HEADER -->
+            <div class="header">
+                <!-- Changed to maingame.html -->
+                <button class="btn-red-back" id="back-btn"><span>⬅</span> Back</button>
+                <h2>Profile</h2>
+                <button class="btn-3d btn-blue" onclick="window.customAlert('Settings', 'Settings Menu Coming Soon!', 'normal')">⚙️</button>
+            </div>
+
+            <!-- SCROLLABLE CONTENT -->
+            <div class="content">
+                
+                <!-- Player Info Card -->
+                <div class="info-card">
+                    <div class="avatar-wrap">
+                        <img src="https://iili.io/CvagcQV.png" alt="🧑‍🌾" style="color:transparent; background:#555; text-align:center; line-height:75px; font-size:40px;">
+                        <div class="lvl-badge" id="profile-lvl">Lvl --</div>
+                    </div>
+                    <div class="p-details">
+                        <div class="p-name"><span id="profile-name">Loading...</span> <span class="vip-tag" id="profile-vip">VIP 0</span></div>
+                        <div class="p-id">ID: <span id="profile-id">#-----</span> <span class="copy-id" onclick="window.copyPlayerId()">Copy</span></div>
+                        <div class="p-guild">🌐 Guild: <span id="profile-guild">None</span></div>
+                    </div>
+                </div>
+
+                <!-- XP Progress -->
+                <div class="xp-wrap">
+                    <div class="xp-txt"><span>⭐ Experience</span><span id="profile-xp-text">0 / 100</span></div>
+                    <div class="xp-bg"><div class="xp-fill" id="profile-xp-bar"></div></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-row">
+                    <button class="btn-3d btn-green" onclick="window.customAlert('Edit Profile', 'Profile Editing Coming Soon!', 'normal')">✏️ Edit Profile</button>
+                    <button class="btn-3d btn-gold" onclick="window.customAlert('Friends', 'Friends List feature will unlock at Level 5!', 'normal')">👥 Friends</button>
+                </div>
+
+                <!-- Game Stats -->
+                <div class="sec-box">
+                    <h3 class="sec-title">📊 Farm Stats</h3>
+                    <div class="stats">
+                        <div class="stat"><span>🌾</span><div class="s-val" id="stat-crops">--</div><div class="s-lbl">Crops Harvested</div></div>
+                        <div class="stat"><span>💰</span><div class="s-val" id="stat-earnings">--</div><div class="s-lbl">Total Earnings</div></div>
+                        <div class="stat"><span>🐄</span><div class="s-val" id="stat-animals">--</div><div class="s-lbl">Animals Owned</div></div>
+                        <div class="stat"><span>📅</span><div class="s-val" id="stat-days">--</div><div class="s-lbl">Days Played</div></div>
+                    </div>
+                </div>
+
+                <!-- Quick Inventory -->
+                <div class="sec-box">
+                    <h3 class="sec-title">🎒 Top Resources</h3>
+                    <!-- Brain.js will populate this -->
+                    <div class="inv" id="profile-inventory">
+                        <!-- Loading... -->
+                    </div>
+                </div>
+
+                <!-- Achievements/Badges -->
+                <div class="sec-box" style="margin-bottom: 5px;">
+                    <h3 class="sec-title">🏅 Badges</h3>
+                    <div class="badges">
+                        <div class="badge"><div class="b-icon">🏆</div><div class="b-txt">Beginner</div></div>
+                        <!-- More badges can be unlocked via brain.js later -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM ALERT OVERLAY -->
+    <div id="custom-alert-overlay" class="modal-overlay" style="z-index: 200;">
+        <div id="custom-alert-box" class="alert-box">
+            <h3 class="alert-title" id="alert-title">Notice</h3>
+            <p class="alert-msg" id="alert-msg">Message goes here.</p>
+            <button class="btn-gold-alert" style="width: 100%;" onclick="window.closeAlert()">OK</button>
+        </div>
+    </div>
+
+    <!-- UI Interaction Script -->
+    <script>
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        
+        // Navigation
+        document.getElementById('back-btn').addEventListener('click', function() {
+            setTimeout(() => window.location.href = 'maingame.html', 150);
+        });
+
+        // Copy ID Function
+        window.copyPlayerId = function() {
+            const idText = document.getElementById('profile-id').innerText;
+            navigator.clipboard.writeText(idText).then(() => {
+                if(typeof window.customAlert === 'function') {
+                    window.customAlert("Copied!", `Your ID ${idText} has been copied to clipboard.`, "success");
+                }
+            });
+        };
+    </script>
+
+    <!-- MAIN GAME LOGIC (Firebase Module) -->
+    <script type="module" src="brain.js"></script>
+</body>
+</html>
