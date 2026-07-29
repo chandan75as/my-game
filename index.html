@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- PREVENT ZOOMING & SCALING -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Cozy Farm</title>
+    <title>Login - My Cozy Farm</title>
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { 
@@ -13,263 +12,234 @@
         -webkit-user-select: none; 
         -webkit-touch-callout: none; 
         touch-action: manipulation; 
-        -webkit-tap-highlight-color: transparent; /* FIX: Removes blue background on click */
-        outline: none; /* FIX: Removes focus borders */
+        -webkit-tap-highlight-color: transparent !important; 
+        outline: none !important; 
     }
-
+    
     body { 
         margin: 0; 
-        padding: 0; 
-        background-color: #000; 
+        background: #000; 
         display: flex; 
         justify-content: center; 
         align-items: center; 
-        height: 100vh; 
+        min-height: 100vh; 
         font-family: sans-serif; 
         overflow: hidden; 
     }
 
-    /* MAIN WRAPPER */
-    .app-wrapper {
-        width: 100%;
-        max-width: 500px;
+    /* --- GAME BACKGROUND --- */
+    .app-wrapper { 
+        width: 100%; 
+        max-width: 500px; 
         height: 100vh; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        background: url('background.jpg') center/cover; 
+        position: relative; 
+        box-shadow: 0 0 30px rgba(0,0,0,0.9); 
+    }
+    
+    /* 70% CLEAR OVERLAY */
+    .bg-overlay { 
+        position: absolute; 
+        inset: 0; 
+        background: rgba(0,0,0,0.3); 
+        z-index: 1; 
+        backdrop-filter: blur(1px); 
+    }
+
+    /* --- 100% INVISIBLE LOGIN PANEL --- */
+    .login-box { 
+        position: relative; 
+        z-index: 2; 
+        width: 85%; 
+        max-width: 340px; 
+        background: transparent; 
+        backdrop-filter: none; 
+        border: none; 
+        box-shadow: none; 
+        padding: 20px; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @keyframes slideDown {
+        0% { transform: translateY(-50px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* --- LOGO & TITLE SECTION --- */
+    .logo-sec { 
+        text-align: center; 
+        margin-bottom: 35px; 
         display: flex;
         flex-direction: column;
-        background-color: #2c2c2c;
-        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        align-items: center;
+    }
+    
+    /* NAYA LOGO IMAGE STYLE */
+    .logo-img {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 25px; /* Thoda rounded shape */
+        border: 4px solid #FFD700; /* Gold Border */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.5);
+        margin-bottom: 15px;
+        background-color: #3E2723; /* Fallback color */
     }
 
-    /* --- GAME SCREEN (Map & Links) --- */
-    .game-screen { 
-        position: relative; 
+    /* NAYA BADA AUR 3D GAME TITLE */
+    .logo-title { 
+        font-size: 70px; /* Size bada kiya */
+        font-weight: 900; 
+        color: #FFD700; 
+        margin: 0; 
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        line-height: 1.1;
+        /* Mast 3D Game Text Effect */
+        text-shadow: 
+            -2px -2px 0 #3E2723,  
+             2px -2px 0 #3E2723,
+            -2px  2px 0 #3E2723,
+             2px  2px 0 #3E2723,
+             3px  4px 0 #5D4037, 
+             4px  6px 4px rgba(0,0,0,0.8),
+             0px  0px 20px rgba(255, 215, 0, 0.6); 
+    }
+    
+    .logo-sub { 
+        font-size: 14px; 
+        color: #FFF; 
+        font-weight: 900; 
+        margin-top: 5px; 
+        text-shadow: 2px 2px 3px #000; 
+        letter-spacing: 1px;
+    }
+
+    /* --- 3D BUTTONS --- */
+    .btn-3d { 
         width: 100%; 
-        aspect-ratio: 2 / 3; 
-        background-image: url('background.jpg'); 
-        background-size: 100% 100%; 
-        background-position: center; 
-        overflow: hidden; 
-        flex-shrink: 0; 
-        border-bottom: 3px solid #444; 
+        border-radius: 12px; 
+        font-weight: 900; 
+        color: #fff; 
+        cursor: pointer; 
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
+        transition: transform 0.1s; 
+        border: none; 
+        padding: 14px 0; 
+        font-size: 16px; 
+        margin-bottom: 12px; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 10px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.4); 
     }
+    .btn-3d:active { 
+        transform: translateY(4px); 
+        border-bottom-width: 2px !important; 
+        margin-bottom: 16px; 
+    }
+    
+    .btn-login { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 6px solid #2E7D32; }
+    .btn-signup { background: #1E90FF; border: 2px solid #0D47A1; border-bottom: 6px solid #0D47A1; }
+    .btn-google { background: #FFF; border: 2px solid #B0BEC5; border-bottom: 6px solid #90A4AE; color: #424242; text-shadow: none; margin-bottom: 0; }
+    .btn-google img { width: 20px; height: 20px; }
 
-    /* --- TOP-LEFT: PROFILE UI --- */
-    .profile-ui {
-        position: absolute; 
-        top: 12px; 
-        left: 8px; 
+    /* --- 'OR' DIVIDER --- */
+    .divider { 
         display: flex; 
         align-items: center; 
-        gap: 6px;
-        background-color: rgba(0,0,0,0.7); 
-        padding: 4px 10px 4px 4px; 
-        border-radius: 30px; 
-        border: 2px solid #deb887; 
-        color: white; 
-        z-index: 15;
+        width: 100%; 
+        margin: 10px 0 20px 0; 
+        color: #FFECB3; 
+        font-size: 12px; 
+        font-weight: bold; 
+        text-shadow: 1px 1px 2px #000; 
     }
-    .profile-ui img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff; background: #555; object-fit: cover; color: transparent; }
-    .profile-info { display: flex; flex-direction: column; line-height: 1.1; }
-    .p-name { font-size: 11px; font-weight: bold; }
-    .p-lvl { font-size: 10px; color: #ffd700; font-weight: bold; }
-
-    /* --- TOP-RIGHT: RESOURCES UI --- */
-    .resources-ui {
-        position: absolute;
-        top: 12px;
-        right: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: rgba(0,0,0,0.7);
-        padding: 5px 10px;
-        border-radius: 20px;
-        border: 2px solid #deb887;
-        color: white;
-        z-index: 15;
-    }
-    .res-item { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
-
-    /* --- AAPKI ORIGINAL CLASSES AUR POSITIONS --- */
-    .clickable-item { position: absolute; text-decoration: none; display: block; z-index: 5; }
-    .clickable-item img { width: 100%; height: auto; display: block; transition: filter 0.3s ease, transform 0.2s ease; }
-    
-    .animalfarm-link { top: 20%; left: 0%; width: 46%; }
-    .gotocity-link   { top: 13%; left: 38%; width: 22%; }
-    .farm-link       { top: 54%; left: 17%; width: 55%; z-index: 4; } 
-    .factory-link    { top: 18.4%; left: 67%; width: 34%; }
-    .profile-link    { top: 42%; left: 1%; width: 30%; } 
-    .storage-link    { top: 20%; left: 19%; width: 64%; } 
-    .zoo-link        { top: 55%; left: 60%; width: 38%; }
-    .market-link     { top: 71%; left: 0%; width: 40%; }
-    .pond-link       { top: 74%; left: 38%; width: 58%; }
-
-    .clickable-item:hover img, .clickable-item:active img, .clickable-item.active-glow img { 
-        filter: drop-shadow(2px 0px 0px yellow) drop-shadow(-2px 0px 0px yellow) drop-shadow(0px 2px 0px yellow) drop-shadow(0px -2px 0px yellow) brightness(1.15); cursor: pointer;
-    }
-
-    /* --- FIXED 2-LINE YELLOW BOTTOM MENU --- */
-    .bottom-menu {
+    .divider::before, .divider::after { 
+        content: ''; 
         flex: 1; 
-        min-height: 0; 
-        background-color: #FFD700;
-        width: 100%;
-        display: flex;
-        flex-direction: column; 
-        justify-content: space-evenly; 
-        padding: 4px 6px; 
-        border-top: 5px solid #D4AC0D;
-        z-index: 20;
+        height: 2px; 
+        background: rgba(255, 255, 255, 0.4); 
+        margin: 0 12px; 
+        border-radius: 2px;
     }
-
-    .menu-row {
-        width: 100%;
-        display: flex;
-        justify-content: space-between; 
-        align-items: center;
+    
+    /* Loading text */
+    #loading-text {
+        color: #FFD700;
+        font-weight: bold;
+        font-size: 15px;
+        margin-top: 15px;
+        text-shadow: 2px 2px 4px #000;
+        display: none;
+        animation: pulse 1s infinite;
     }
-
-    .btn-3d {
-        border-radius: 10px; 
-        padding: 5px 2px; 
-        font-size: 11px; 
-        font-weight: 900;
-        color: #fff;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        cursor: pointer;
-        display: flex;
-        flex-direction: column; 
-        align-items: center;
-        gap: 2px; 
-        transition: all 0.1s ease-in-out;
-        width: 19%; 
-    }
-    .btn-3d span { font-size: 18px; } 
-
-    .top-row .btn-3d {
-        width: 35%; 
-        padding: 8px 5px;
-        font-size: 12px;
-    }
-    .top-row .btn-3d span { font-size: 24px; }
-
-    .btn-circle-3d {
-        background-color: #1E90FF;
-        border: 2px solid #0000CD;
-        border-bottom: 6px solid #0000CD;
-        border-radius: 50%; 
-        width: 62px; 
-        height: 62px;
-        font-size: 28px; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: all 0.1s ease-in-out;
-        margin-top: -20px; 
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        z-index: 25;
-    }
-
-    /* BUTTON COLORS */
-    .c-shop   { background-color: #FF5252; border: 2px solid #C62828; border-bottom: 4px solid #C62828; }
-    .c-task   { background-color: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; }
-    .c-event  { background-color: #9C27B0; border: 2px solid #6A1B9A; border-bottom: 4px solid #6A1B9A; }
-    .c-set    { background-color: #78909C; border: 2px solid #455A64; border-bottom: 4px solid #455A64; }
-    .c-bag    { background-color: #8D6E63; border: 2px solid #4E342E; border-bottom: 4px solid #4E342E; }
-    .c-lead   { background-color: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; }
-    .c-news   { background-color: #26C6DA; border: 2px solid #00838F; border-bottom: 4px solid #00838F; }
-
-    .btn-3d:active, .btn-circle-3d:active {
-        transform: translateY(3px);
-        border-bottom-width: 2px !important;
-        margin-bottom: 2px; 
-        filter: brightness(0.9);
-    }
+    @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div class="app-wrapper">
-        
-        <div class="game-screen">
-            <!-- Profile UI -->
-            <div class="profile-ui">
-                <img src="https://iili.io/CvagcQV.png" alt="User">
-                <div class="profile-info">
-                    <span class="p-name" id="player-name">Mr Chandu</span>
-                    <span class="p-lvl" id="player-level">⭐ Level 1</span>
-                </div>
+        <div class="bg-overlay"></div> 
+
+        <div class="login-box">
+            
+            <!-- Logo & Title -->
+            <div class="logo-sec">
+                <!-- NAYA LOGO IMAGE -->
+                <img src="logo.jpg" alt="Farm Logo" class="logo-img">
+                
+                <!-- BADA AUR 3D TEXT -->
+                <h1 class="logo-title">Cozy<br>Farm</h1>
+                <div class="logo-sub">Welcome to your farm life!</div>
             </div>
 
-            <!-- Resources UI -->
-            <div class="resources-ui">
-                <div class="res-item" id="coin-display">💰 50</div>
-                <div class="res-item" id="gem-display">💎 5</div>
-                <div class="res-item" id="wheat-display">🌾 1/5</div>
-            </div>
+            <!-- Login Buttons -->
+            <button class="btn-3d btn-login" onclick="enterGame()">
+                <span>🔓</span> Login
+            </button>
+            
+            <button class="btn-3d btn-signup" onclick="enterGame()">
+                <span>📝</span> Sign Up
+            </button>
 
-            <a href="animalfarm.html" class="animalfarm-link clickable-item"><img src="animalfarm.png" alt="Animal Farm"></a>
-            <a href="gotocity.html" class="gotocity-link clickable-item"><img src="gotocity.png" alt="Go to City"></a>
-            <a href="farm.html" class="farm-link clickable-item"><img src="farm.png" alt="Farm House"></a>
-            <a href="factory.html" class="factory-link clickable-item"><img src="factory.png" alt="Factory"></a>
-            <a href="profile.html" class="profile-link clickable-item"><img src="house.png" alt="Profile"></a>
-            <a href="storage.html" class="storage-link clickable-item"><img src="storage.png" alt="Storage"></a>
-            <a href="zoo.html" class="zoo-link clickable-item"><img src="zoo.png" alt="Zoo"></a>
-            <a href="market.html" class="market-link clickable-item"><img src="market.png" alt="Market"></a>
-            <a href="pond.html" class="pond-link clickable-item"><img src="pond.png" alt="Pond"></a>
-        </div>
+            <!-- Divider -->
+            <div class="divider"><span>OR</span></div>
 
-        <div class="bottom-menu">
-            <div class="menu-row top-row">
-                <button class="btn-3d c-shop nav-btn" data-url="soon"><span>🛍️</span>Shop</button>
-                <button class="btn-circle-3d nav-btn" data-url="index.html">🏠</button>
-                <button class="btn-3d c-task nav-btn" data-url="task.html"><span>📋</span>Task</button>
-            </div>
-            <div class="menu-row bottom-row">
-                <button class="btn-3d c-event nav-btn" data-url="soon"><span>🎪</span>Events</button>
-                <button class="btn-3d c-set nav-btn" data-url="soon"><span>⚙️</span>Setting</button>
-                <button class="btn-3d c-bag nav-btn" data-url="storage.html">🌐<span></span>guild</button>
-                <button class="btn-3d c-lead nav-btn" data-url="soon"><span>🏆</span>Ranks</button>
-                <button class="btn-3d c-news nav-btn" data-url="news.html"><span>📰</span>News</button>
-            </div>
+            <!-- Google Login Button -->
+            <button class="btn-3d btn-google" onclick="enterGame()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <!-- Status Text -->
+            <div id="loading-text">Loading Farm... 🚜</div>
+
         </div>
     </div>
 
-    <!-- UI Interactions Script (Kept as it was) -->
+    <!-- UI INTERACTION SCRIPT -->
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
-        
-        const allLinks = document.querySelectorAll('.clickable-item');
-        allLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                this.classList.add('active-glow');
-                const targetUrl = this.href;
-                setTimeout(function() { window.location.href = targetUrl; }, 300);
-            });
-        });
-        window.addEventListener('pageshow', function(event) {
-            allLinks.forEach(link => { link.classList.remove('active-glow'); });
-        });
 
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(btn => {
-            btn.addEventListener('click', function(event) {
-                event.preventDefault();
-                const targetUrl = this.getAttribute('data-url');
-                setTimeout(() => {
-                    if (targetUrl === 'soon') {
-                        alert('Coming Soon!');
-                    } else {
-                        window.location.href = targetUrl;
-                    }
-                }, 150);
-            });
-        });
+        function enterGame() {
+            document.getElementById('loading-text').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'maingame.html';
+            }, 500); // Thoda delay badha diya taaki loading text dikhe
+        }
     </script>
-
-    <!-- Brain JS for Future Logic (Yahan add kar diya) -->
-    <script src="brain.js"></script>
 </body>
 </html>
