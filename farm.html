@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Barn - My Cozy Farm</title>
+    <style>
+    /* --- APP-LIKE RESTRICTIONS --- */
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important; }
+    
+    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; font-family: sans-serif; overflow: hidden; }
+
+    /* --- GAME BACKGROUND & WRAPPER --- */
+    .app-wrapper { width: 100%; max-width: 500px; height: 100vh; display: flex; flex-direction: column; background: url('background.jpg') center/cover; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
+    .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.65); z-index: 1; backdrop-filter: blur(2px); }
+
+    /* --- 3D WOODEN FARM PANEL --- */
+    .farm-panel { position: relative; z-index: 2; margin: 15px; flex: 1; background: #8D6E63; border: 4px solid #4E342E; border-radius: 18px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.4); overflow: hidden; }
+    
+    /* Header */
+    .header { background: #C62828; border-bottom: 4px solid #8E0000; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+    .header h2 { margin: 0; font-size: 18px; color: #FFF; text-shadow: 2px 2px 3px #000; text-transform: uppercase; letter-spacing: 1px; }
+    .res-container { display: flex; gap: 5px; }
+    .mini-res { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; font-size: 12px; border: 1px solid #FFD700; display: flex; align-items: center; gap: 3px; }
+    .res-gem { border-color: #00E5FF; }
+
+    /* Scrollable Content Area */
+    .content { padding: 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: hidden; }
+
+    /* --- 3D BUTTONS --- */
+    .btn-3d { border-radius: 8px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.1s; border: none; padding: 10px; font-size: 14px; }
+    .btn-3d:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; filter: brightness(0.9); }
+    .btn-red { background: #E53935; border: 2px solid #B71C1C; border-bottom: 4px solid #B71C1C; padding: 6px 12px; font-size: 12px; }
+    .btn-green { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; flex: 1; }
+    .btn-gold { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; flex: 1; }
+    .btn-blue { background: #1E90FF; border: 2px solid #0000CD; border-bottom: 4px solid #0000CD; padding: 5px 10px; font-size: 11px; }
+    .btn-purple { background: #9C27B0; border: 2px solid #6A1B9A; border-bottom: 4px solid #6A1B9A; flex: 1; }
+
+    /* --- BARN STATUS CARD --- */
+    .barn-card { background: linear-gradient(135deg, #E53935, #B71C1C); border: 2px solid #FFF; border-radius: 12px; padding: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.5); color: white; flex-shrink: 0; }
+    .b-info { display: flex; flex-direction: column; gap: 2px; }
+    .b-title { font-size: 15px; font-weight: 900; text-shadow: 1px 1px 2px #000; display: flex; align-items: center; gap: 5px; }
+    .b-cap { font-size: 11px; font-weight: bold; color: #FFCDD2; }
+    .cap-bar { width: 100px; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; border: 1px solid #FFCDD2; }
+    .cap-fill { height: 100%; width: 0%; background: #FFD700; transition: width 0.3s ease; }
+    .upgrade-costs { font-size: 9px; color: #FFD700; text-align: center; margin-top: 3px; font-weight: bold; }
+
+    /* --- ACTIVE EQUIPPED TOOL BANNER --- */
+    .equipped-bar { background: #1565C0; color: white; text-align: center; font-size: 13px; font-weight: bold; padding: 8px; border-radius: 8px; border: 2px solid #0D47A1; margin-bottom: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); flex-shrink: 0; }
+    .equipped-bar span { color: #FFD700; }
+
+    /* --- FARM PLOTS GRID --- */
+    .sec-box { background: rgba(0,0,0,0.25); border: 2px solid #5D4037; border-radius: 12px; padding: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); flex: 1; overflow-y: auto; min-height: 0; }
+    .sec-box::-webkit-scrollbar { display: none; }
+    
+    .plot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    
+    .plot { height: 80px; border: 3px inset #3E2723; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: transform 0.1s; }
+    .plot:active { transform: scale(0.92); } 
+    .plot-icon { font-size: 32px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+    .plot-tag { position: absolute; bottom: -5px; background: #212121; color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: bold; border: 1px solid #FFF; text-shadow: 1px 1px 1px #000; box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 5; }
+
+    .plot.raw { background: #795548; border-color: #5D4037; }
+    .plot.dug { background: #4E342E; border-color: #3E2723; }
+    .plot.planted { background: #5D4037; border-color: #4E342E; }
+    .plot.watered { background: #3E2723; border-color: #1B5E20; }
+    .plot.ready { background: #689F38; border-color: #8BC34A; box-shadow: 0 0 10px #8BC34A; }
+    .plot.ready .plot-icon { animation: bounce 1.5s infinite; }
+
+    .plot.add-plot { background: rgba(0,0,0,0.5); border: 3px dashed #FFD700; opacity: 0.9; }
+    .plot.add-plot .plot-icon { font-size: 24px; color: #FFD700; text-shadow: 1px 1px 2px #000; }
+    .plot.empty-slot { border: 2px dashed rgba(62,39,35,0.4); background: transparent; cursor: default; }
+    .plot.empty-slot:active { transform: none; }
+
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+    /* --- BOTTOM CONTROLS --- */
+    .bottom-controls { margin-top: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 15px; border: 2px solid #4E342E; flex-shrink: 0; }
+    
+    .action-row { display: flex; gap: 10px; }
+    
+    .category-menu { display: flex; justify-content: space-between; gap: 8px; }
+    .cat-box { flex: 1; background: #FF9800; border: 2px solid #E65100; border-bottom: 4px solid #E65100; border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+    .cat-box:active { transform: translateY(3px); border-bottom-width: 2px; }
+    .cat-box img { width: 35px; height: 35px; margin-bottom: 4px; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
+    .cat-box span { color: #FFF; font-weight: 900; font-size: 11px; text-shadow: 1px 1px 2px #000; text-transform: uppercase; }
+
+    .cat-tools { background: #607D8B; border-color: #455A64; }
+    .cat-fert  { background: #9C27B0; border-color: #6A1B9A; }
+    .cat-seeds { background: #4CAF50; border-color: #2E7D32; }
+
+    /* --- POPUPS & MODALS --- */
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; border-radius: 15px; }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    
+    .modal-box { background: #8D6E63; width: 90%; border: 4px solid #4E342E; border-radius: 16px; box-shadow: 0 10px 30px #000; transform: translateY(20px); transition: transform 0.3s; display: flex; flex-direction: column; max-height: 80%; }
+    .modal-overlay.show .modal-box { transform: translateY(0); }
+    
+    .modal-header { background: #5D4037; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; border-bottom: 3px solid #3E2723; }
+    .modal-header h3 { margin: 0; color: #FFD700; font-size: 16px; text-transform: uppercase; text-shadow: 1px 1px 2px #000; }
+    .close-btn { background: #E53935; border: 2px solid #B71C1C; color: white; font-weight: bold; width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 4px #000; }
+    
+    .modal-body { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    
+    .popup-item { background: #4E342E; border: 2px solid #3E2723; border-radius: 10px; padding: 8px 5px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+    .popup-item:active { transform: scale(0.95); border-color: #FFD700; }
+    .popup-icon { font-size: 28px; margin-bottom: 5px; filter: drop-shadow(1px 1px 2px #000); }
+    .popup-name { font-size: 10px; color: #FFF; font-weight: bold; }
+    .popup-price { font-size: 10px; font-weight: bold; margin-top: 4px; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 6px; border: 1px solid #555; }
+    .price-coin { color: #FFD700; }
+    .price-gem { color: #00E5FF; }
+    .price-bag { color: #8BC34A; }
+
+    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
+    .modal-overlay.show .alert-box { transform: scale(1); }
+    .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
+    .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
+    
+    /* Dynamic Alert Colors */
+    .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
+    .alert-box.success .alert-title { color: #C8E6C9; }
+    .alert-box.error { border-color: #E53935; background: #C62828; }
+    .alert-box.error .alert-title { color: #FFCDD2; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="app-wrapper">
+        <div class="bg-overlay"></div> 
+
+        <div class="farm-panel">
+            
+            <!-- HEADER (DEFAULT NO DATA - Will load from brain.js) -->
+            <div class="header">
+                <!-- Back Button Updated to maingame.html -->
+                <button class="btn-3d btn-red nav-btn" data-url="maingame.html"><span>⬅</span></button>
+                <h2>My Farm</h2>
+                <div class="res-container">
+                    <div class="mini-res" id="coin-ui">🪙 --</div>
+                    <div class="mini-res res-gem" id="gem-ui">💎 --</div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+                
+                <!-- Barn Status Card (DEFAULT NO DATA) -->
+                <div class="barn-card">
+                    <div class="b-info">
+                        <div class="b-title">🏠 Big Red Barn</div>
+                        <div class="b-cap" id="storage-txt">Storage: -- / --</div>
+                        <div class="cap-bar"><div class="cap-fill" id="storage-bar"></div></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <button class="btn-3d btn-blue" onclick="window.upgradeBarn()">⬆ Upgrade</button>
+                        <span class="upgrade-costs">1000🪙 or 10💎</span>
+                    </div>
+                </div>
+
+                <!-- EQUIPPED TOOL BANNER -->
+                <div class="equipped-bar">
+                    Hand: <span id="active-tool-display">✋ None (Select below)</span>
+                </div>
+
+                <!-- FIELDS GRID -->
+                <div class="sec-box">
+                    <div class="plot-grid" id="main-farm">
+                        <!-- brain.js will populate this area automatically -->
+                    </div>
+                </div>
+
+                <!-- BOTTOM CONTROLS -->
+                <div class="bottom-controls">
+                    <div class="action-row">
+                        <button class="btn-3d btn-green" style="flex: 0.7;" onclick="window.harvestAll()">🧺 Harvest All</button>
+                        <!-- DYNAMIC BUTTON -->
+                        <button class="btn-3d btn-gold" id="dynamic-action-btn" onclick="window.openModal('Seeds')">🌱 Select Seed</button>
+                    </div>
+
+                    <div class="category-menu">
+                        <div class="cat-box cat-tools" onclick="window.openModal('Tools')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2884/2884100.png" alt="Tools">
+                            <span>Tools</span>
+                        </div>
+                        <div class="cat-box cat-fert" onclick="window.openModal('Fertilizers')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" alt="Fertilizer">
+                            <span>Fertilizer</span>
+                        </div>
+                        <div class="cat-box cat-seeds" onclick="window.openModal('Seeds')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3014/3014522.png" alt="Seeds">
+                            <span>Seeds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENU POPUP MODAL -->
+            <div id="item-modal" class="modal-overlay">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Select Item</h3>
+                        <button class="close-btn" onclick="window.closeModal()">❌</button>
+                    </div>
+                    <div class="modal-body" id="modal-content">
+                        <!-- Dynamic Content from brain.js -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW COLORFUL ALERT BOX -->
+            <div id="custom-alert-overlay" class="modal-overlay" style="z-index: 200;">
+                <div id="custom-alert-box" class="alert-box">
+                    <h3 class="alert-title" id="alert-title">Notice</h3>
+                    <p class="alert-msg" id="alert-msg">Message goes here.</p>
+                    <button class="btn-3d btn-gold" style="width: 100%; font-size: 16px; padding: 12px;" onclick="window.closeAlert()">OK</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SIMPLE NAVIGATION SCRIPT -->
+    <script>
+        document.addEventListener('gesturestart', e => e.preventDefault());
+
+        // Simple Nav Back to maingame.html (No game logic here!)
+        const navBtns = document.querySelectorAll('.nav-btn');
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.getAttribute('data-url') || 'maingame.html';
+                setTimeout(() => window.location.href = target, 150);
+            });
+        });
+    </script>
+    
+    <!-- MAIN ENGINE (ALL DATA AND LOGIC LOADS FROM HERE IN MODULE MODE) -->
+    <script type="module" src="brain.js"></script>
+
+</body>
+</html>
