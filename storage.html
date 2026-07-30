@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Storage Bag - My Cozy Farm</title>
+
+    <!-- PRELOAD BACKGROUND -->
+    <link rel="preload" href="background.jpg" as="image">
+
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important; }
@@ -45,11 +49,11 @@
     .item-name { font-size: 10px; color: #FFF; font-weight: bold; text-shadow: 1px 1px 1px #000; text-align: center; }
     
     .item-qty { position: absolute; top: -6px; right: -6px; background: #1E90FF; color: #FFF; border: 2px solid #FFF; font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .stack-full { background: #FF5252; border-color: #FFD700; color: #FFF; } /* Jab packet 25 ho jayega */
+    .stack-full { background: #FF5252; border-color: #FFD700; color: #FFF; } 
     
     .empty-card { opacity: 0.5; filter: grayscale(0.8); pointer-events: none; }
 
-    /* --- POPUP MODAL --- */
+    /* --- POPUP MODAL (For Transfer Controls) --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
     
@@ -59,7 +63,6 @@
     .modal-header { background: #5D4037; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; border-bottom: 3px solid #3E2723; }
     .modal-header h3 { margin: 0; color: #FFD700; font-size: 16px; text-transform: uppercase; text-shadow: 1px 1px 2px #000; }
     
-    /* ❌ YELLOW CLOSE BUTTON */
     .close-btn { background: #FFCA28; border: 2px solid #FF8F00; color: #3E2723; font-weight: 900; font-size: 14px; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 4px #000; transition: transform 0.1s; }
     .close-btn:active { transform: scale(0.9); border-color: #FFF; }
     
@@ -74,21 +77,23 @@
     .qty-btn:active { transform: scale(0.9); }
     .qty-display { font-size: 18px; font-weight: 900; color: #FFF; background: #4E342E; padding: 5px 20px; border-radius: 8px; border: 2px inset #271610; text-shadow: 1px 1px 1px #000; min-width: 60px; }
 
-    /* Action Buttons in Modal */
     .modal-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
     .btn-3d { width: 100%; border-radius: 8px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: none; font-size: 13px; transition: transform 0.1s; }
     .btn-3d:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; }
-    
     .btn-transfer { background: #1E90FF; border: 2px solid #0D47A1; border-bottom: 4px solid #0D47A1; }
     .btn-use { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; }
 
-    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    /* --- 🌟 AUTO-HIDE TOAST NOTIFICATIONS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+
+    /* --- OLD ALERT BOX (Kept fallback for major errors) --- */
     .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
     .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
     .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
-    
-    /* Dynamic Alert Colors */
     .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
     .alert-box.success .alert-title { color: #C8E6C9; }
     .alert-box.error { border-color: #E53935; background: #C62828; }
@@ -101,6 +106,9 @@
 
     <div class="app-wrapper">
         <div class="bg-overlay"></div> 
+
+        <!-- TOAST CONTAINER -->
+        <div class="toast-container" id="toast-container"></div>
 
         <div class="storage-panel">
             
@@ -120,16 +128,17 @@
                 <div class="meter-bg"><div class="meter-fill" id="storage-bar"></div></div>
             </div>
 
-            <!-- TABS -->
+            <!-- TABS (🌟 NEW EQUIPMENT TAB ADDED 🌟) -->
             <div class="tabs">
                 <div class="tab-btn active" data-cat="crops">🌾 Crops</div>
                 <div class="tab-btn" data-cat="goods">🥛 Goods</div>
                 <div class="tab-btn" data-cat="seeds">🌱 Seeds</div>
+                <div class="tab-btn" data-cat="equipment">🚜 Equip</div>
             </div>
 
-            <!-- INVENTORY GRID (100% CONTROLLED BY BRAIN.JS) -->
+            <!-- INVENTORY GRID -->
             <div class="content" id="inventory-grid">
-                <!-- Data aayega brain.js se -->
+                <!-- Data injected by brain.js -->
             </div>
 
         </div>
@@ -154,7 +163,7 @@
         </div>
     </div>
 
-    <!-- NEW COLORFUL ALERT BOX -->
+    <!-- OLD COLORFUL ALERT BOX -->
     <div id="custom-alert-overlay" class="modal-overlay" style="z-index: 200;">
         <div id="custom-alert-box" class="alert-box">
             <h3 class="alert-title" id="alert-title">Notice</h3>
@@ -163,16 +172,15 @@
         </div>
     </div>
 
-    <!-- HTML WALI SCRIPT SIRF NAVIGATION KE LIYE (NO DATA) -->
+    <!-- UI VISUAL SCRIPT -->
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
 
-        // Back button to MAINGAME.HTML
         document.getElementById('back-btn').addEventListener('click', function() {
             setTimeout(() => window.location.href = 'maingame.html', 150);
         });
 
-        // Tab click effect (Visual only, logic in brain.js)
+        // Tab click effect (Visual only)
         const tabs = document.querySelectorAll('.tab-btn');
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
@@ -181,13 +189,25 @@
             });
         });
 
-        // Simple Close Modal visual
         document.getElementById('close-modal-btn').addEventListener('click', function() {
             document.getElementById('item-modal').classList.remove('show');
         });
+
+        // 🌟 TOAST FUNCTION FOR SMOOTH ALERTS 🌟
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            let icon = type === 'success' ? '✅' : '❌';
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2000);
+        };
     </script>
 
-    <!-- MAIN GAME LOGIC (MODULE TYPE ADDED FOR FIREBASE) -->
+    <!-- MAIN GAME LOGIC -->
     <script type="module" src="brain.js"></script>
 </body>
 </html>
