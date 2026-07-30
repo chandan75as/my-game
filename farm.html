@@ -111,13 +111,17 @@
     .price-gem { color: #00E5FF; }
     .price-bag { color: #8BC34A; }
 
-    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    /* --- 🌟 NEW: AUTO-HIDE TOAST NOTIFICATIONS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+
+    /* --- OLD CUSTOM ALERT BOX (Kept only for major things like Barn Upgrades) --- */
     .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
     .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
     .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
-    
-    /* Dynamic Alert Colors */
     .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
     .alert-box.success .alert-title { color: #C8E6C9; }
     .alert-box.error { border-color: #E53935; background: #C62828; }
@@ -129,11 +133,13 @@
     <div class="app-wrapper">
         <div class="bg-overlay"></div> 
 
+        <!-- TOAST CONTAINER FOR FAST ACTIONS -->
+        <div class="toast-container" id="toast-container"></div>
+
         <div class="farm-panel">
             
-            <!-- HEADER (DEFAULT NO DATA - Will load from brain.js) -->
+            <!-- HEADER -->
             <div class="header">
-                <!-- Back Button Updated to maingame.html -->
                 <button class="btn-3d btn-red nav-btn" data-url="maingame.html"><span>⬅</span></button>
                 <h2>My Farm</h2>
                 <div class="res-container">
@@ -145,7 +151,7 @@
             <!-- CONTENT -->
             <div class="content">
                 
-                <!-- Barn Status Card (DEFAULT NO DATA) -->
+                <!-- Barn Status Card -->
                 <div class="barn-card">
                     <div class="b-info">
                         <div class="b-title">🏠 Big Red Barn</div>
@@ -174,7 +180,6 @@
                 <div class="bottom-controls">
                     <div class="action-row">
                         <button class="btn-3d btn-green" style="flex: 0.7;" onclick="window.harvestAll()">🧺 Harvest All</button>
-                        <!-- DYNAMIC BUTTON -->
                         <button class="btn-3d btn-gold" id="dynamic-action-btn" onclick="window.openModal('Seeds')">🌱 Select Seed</button>
                     </div>
 
@@ -208,7 +213,7 @@
                 </div>
             </div>
 
-            <!-- NEW COLORFUL ALERT BOX -->
+            <!-- OLD ALERT BOX (Kept ONLY for major decisions like Upgrade Barn) -->
             <div id="custom-alert-overlay" class="modal-overlay" style="z-index: 200;">
                 <div id="custom-alert-box" class="alert-box">
                     <h3 class="alert-title" id="alert-title">Notice</h3>
@@ -220,11 +225,11 @@
         </div>
     </div>
 
-    <!-- SIMPLE NAVIGATION SCRIPT -->
+    <!-- UI SCRIPT -->
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
 
-        // Simple Nav Back to maingame.html (No game logic here!)
+        // Simple Nav Back to maingame.html
         const navBtns = document.querySelectorAll('.nav-btn');
         navBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
@@ -233,6 +238,26 @@
                 setTimeout(() => window.location.href = target, 150);
             });
         });
+
+        // 🌟 NEW TOAST FUNCTION (No clicking "OK" needed anymore!) 🌟
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            // Add emoji based on type
+            let icon = type === 'success' ? '✅' : '❌';
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 2 seconds (animation takes 2s)
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 2000);
+        };
     </script>
     
     <!-- MAIN ENGINE (ALL DATA AND LOGIC LOADS FROM HERE IN MODULE MODE) -->
