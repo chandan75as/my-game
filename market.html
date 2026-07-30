@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Market - My Cozy Farm</title>
+
+    <!-- PRELOAD BACKGROUND -->
+    <link rel="preload" href="background.jpg" as="image">
+
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important; }
@@ -33,7 +37,7 @@
     .tab-btn { flex: 1; background: #6D4C41; border: 2px solid #4E342E; border-bottom: 4px solid #4E342E; border-radius: 8px 8px 0 0; padding: 8px 0; color: #D7CCC8; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.1s; display: flex; justify-content: center; align-items: center; gap: 3px; }
     .tab-btn.active { background: #8D6E63; color: #FFF; border-color: #FFD700; border-bottom-color: #8D6E63; border-bottom-width: 0; padding-bottom: 12px; transform: translateY(2px); text-shadow: 1px 1px 2px #000; }
 
-    /* --- FIX: SCROLLABLE ITEMS GRID (OVERLAY ISSUE SOLVED) --- */
+    /* --- SCROLLABLE ITEMS GRID --- */
     .content { padding: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; align-content: start; flex: 1; overflow-y: auto; min-height: 0; }
     .content::-webkit-scrollbar { display: none; }
 
@@ -51,14 +55,19 @@
     .btn-sell-one { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; }
     .btn-sell-all { background: #FF9800; border: 2px solid #E65100; border-bottom: 4px solid #E65100; }
 
-    /* --- CUSTOM ALERT BOX --- */
+    /* --- 🌟 TOAST NOTIFICATIONS CSS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+
+    /* --- CUSTOM ALERT BOX (Kept fallback for major alerts) --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
     .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
     .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
     .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
-    
     .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
     .alert-box.success .alert-title { color: #C8E6C9; }
     .alert-box.error { border-color: #E53935; background: #C62828; }
@@ -72,6 +81,9 @@
     <div class="app-wrapper">
         <div class="bg-overlay"></div> 
 
+        <!-- TOAST CONTAINER -->
+        <div class="toast-container" id="toast-container"></div>
+
         <div class="market-panel">
             
             <!-- HEADER -->
@@ -79,8 +91,9 @@
                 <button class="btn-red-back" id="back-btn"><span>⬅</span> Back</button>
                 <h2>🏪 Market</h2>
                 <div class="res-container">
-                    <div class="mini-res" id="coin-display">🪙 --</div>
-                    <div class="mini-res res-gem" id="gem-display">💎 --</div>
+                    <!-- 🔥 ID FIX: display ko ui kiya taaki saare pages sync ho jayein 🔥 -->
+                    <div class="mini-res" id="coin-ui">🪙 --</div>
+                    <div class="mini-res res-gem" id="gem-ui">💎 --</div>
                 </div>
             </div>
 
@@ -88,7 +101,6 @@
             <div class="tabs">
                 <div class="tab-btn active" data-cat="crops">🌾 Crops</div>
                 <div class="tab-btn" data-cat="goods">🥛 Goods</div>
-                <!-- NAYA TAB: EQUIPMENT -->
                 <div class="tab-btn" data-cat="equipment">🚜 Equipment</div> 
             </div>
 
@@ -109,7 +121,7 @@
         </div>
     </div>
 
-    <!-- UI VISUAL LOGIC ONLY -->
+    <!-- UI VISUAL LOGIC -->
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
 
@@ -124,6 +136,19 @@
         document.getElementById('back-btn').addEventListener('click', function() {
             setTimeout(() => window.location.href = 'maingame.html', 150);
         });
+
+        // 🌟 NEW TOAST FUNCTION 🌟
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            let icon = type === 'success' ? '💰' : '❌'; // Changed success icon to money bag for market
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2000);
+        };
     </script>
 
     <!-- MAIN GAME LOGIC (MODULE TYPE FOR FIREBASE) -->
