@@ -11,7 +11,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from
 document.addEventListener('gesturestart', e => e.preventDefault());
 
 // ==========================================
-// 📚 GLOBAL GAME DATABASE
+// 📚 GLOBAL GAME DATABASE (MEGA EMOJI UPDATE)
 // ==========================================
 window.GAME_DB = {
     Tools: [
@@ -24,22 +24,77 @@ window.GAME_DB = {
         { id: 'fert-2', type: 'fertilizer', icon: '✨', name: 'InstaGro', cost: 1, cur: 'gem', speed: 9999 }
     ],
     Seeds: {
+        // --- BASIC SEEDS ---
         'seed-wheat': { id: 'seed-wheat', type: 'seed', icon: '🌾', name: 'Wheat Seed', time: 10, yields: 'wheat' },
         'seed-corn': { id: 'seed-corn', type: 'seed', icon: '🌽', name: 'Corn Seed', time: 20, yields: 'corn' },
-        'seed-tomato': { id: 'seed-tomato', type: 'seed', icon: '🍅', name: 'Tomato Seed', time: 30, yields: 'tomato' }
+        'seed-tomato': { id: 'seed-tomato', type: 'seed', icon: '🍅', name: 'Tomato Seed', time: 30, yields: 'tomato' },
+        
+        // --- NEW EMOJI VEGGIE SEEDS ---
+        'seed-carrot': { id: 'seed-carrot', type: 'seed', icon: '🥕', name: 'Carrot Seed', time: 15, yields: 'carrot' },
+        'seed-potato': { id: 'seed-potato', type: 'seed', icon: '🥔', name: 'Potato Seed', time: 25, yields: 'potato' },
+        'seed-eggplant': { id: 'seed-eggplant', type: 'seed', icon: '🍆', name: 'Eggplant Seed', time: 35, yields: 'eggplant' },
+        'seed-broccoli': { id: 'seed-broccoli', type: 'seed', icon: '🥦', name: 'Broccoli Seed', time: 40, yields: 'broccoli' },
+        'seed-chili': { id: 'seed-chili', type: 'seed', icon: '🌶️', name: 'Chili Seed', time: 22, yields: 'chili' },
+        'seed-garlic': { id: 'seed-garlic', type: 'seed', icon: '🧄', name: 'Garlic Bulb', time: 18, yields: 'garlic' },
+
+        // --- NEW EMOJI FRUIT SEEDS ---
+        'seed-strawberry': { id: 'seed-strawberry', type: 'seed', icon: '🍓', name: 'Berry Seed', time: 45, yields: 'strawberry' },
+        'seed-watermelon': { id: 'seed-watermelon', type: 'seed', icon: '🍉', name: 'Melon Seed', time: 60, yields: 'watermelon' },
+        'seed-grapes': { id: 'seed-grapes', type: 'seed', icon: '🍇', name: 'Grape Seed', time: 50, yields: 'grapes' },
+        'seed-apple': { id: 'seed-apple', type: 'seed', icon: '🍎', name: 'Apple Sapling', time: 120, yields: 'apple' },
+        'seed-mango': { id: 'seed-mango', type: 'seed', icon: '🥭', name: 'Mango Sapling', time: 150, yields: 'mango' }
     },
     Items: {
+        // --------------------------------------
+        // 🌾 1. CROPS & FRUITS (Grown from Seeds)
+        // --------------------------------------
         'wheat': { name: 'Wheat', icon: '🌾', cat: 'crops', price: 5 },
-        'tomato': { name: 'Tomato', icon: '🍅', cat: 'crops', price: 12 },
         'corn': { name: 'Corn', icon: '🌽', cat: 'crops', price: 8 },
+        'tomato': { name: 'Tomato', icon: '🍅', cat: 'crops', price: 12 },
+        'carrot': { name: 'Carrot', icon: '🥕', cat: 'crops', price: 10 },
+        'potato': { name: 'Potato', icon: '🥔', cat: 'crops', price: 15 },
+        'eggplant': { name: 'Eggplant', icon: '🍆', cat: 'crops', price: 20 },
+        'broccoli': { name: 'Broccoli', icon: '🥦', cat: 'crops', price: 22 },
+        'chili': { name: 'Spicy Chili', icon: '🌶️', cat: 'crops', price: 18 },
+        'garlic': { name: 'Garlic', icon: '🧄', cat: 'crops', price: 14 },
+        'strawberry': { name: 'Strawberry', icon: '🍓', cat: 'crops', price: 25 },
+        'watermelon': { name: 'Watermelon', icon: '🍉', cat: 'crops', price: 40 },
+        'grapes': { name: 'Grapes', icon: '🍇', cat: 'crops', price: 30 },
+        'apple': { name: 'Fresh Apple', icon: '🍎', cat: 'crops', price: 35 },
+        'mango': { name: 'King Mango', icon: '🥭', cat: 'crops', price: 50 },
+        'mushroom': { name: 'Wild Mushroom', icon: '🍄', cat: 'crops', price: 16 },
+
+        // --------------------------------------
+        // 🍔 2. GOODS & FOODS (Bakery, Dairy, Kitchen)
+        // --------------------------------------
         'milk': { name: 'Cow Milk', icon: '🥛', cat: 'goods', price: 25 },
         'egg': { name: 'Fresh Egg', icon: '🥚', cat: 'goods', price: 10 },
+        'cheese': { name: 'Cheese Block', icon: '🧀', cat: 'goods', price: 45 },
+        'meat': { name: 'Raw Meat', icon: '🥩', cat: 'goods', price: 60 },
+        'bread': { name: 'Fresh Bread', icon: '🍞', cat: 'goods', price: 30 },
+        'croissant': { name: 'Croissant', icon: '🥐', cat: 'goods', price: 35 },
+        'burger': { name: 'Farm Burger', icon: '🍔', cat: 'goods', price: 120 },
+        'pizza': { name: 'Hot Pizza', icon: '🍕', cat: 'goods', price: 150 },
+        'fries': { name: 'Crispy Fries', icon: '🍟', cat: 'goods', price: 50 },
+        'sushi': { name: 'Premium Sushi', icon: '🍣', cat: 'goods', price: 200 },
+        'cake': { name: 'Strawberry Cake', icon: '🍰', cat: 'goods', price: 250 },
+        'chocolate': { name: 'Chocolate Bar', icon: '🍫', cat: 'goods', price: 80 },
+        'honey': { name: 'Pure Honey', icon: '🍯', cat: 'goods', price: 75 },
+        'coffee': { name: 'Hot Coffee', icon: '☕', cat: 'goods', price: 40 },
+        'beer': { name: 'Cold Beer', icon: '🍺', cat: 'goods', price: 65 },
+        'juice': { name: 'Fruit Juice', icon: '🧃', cat: 'goods', price: 35 },
+
+        // --------------------------------------
+        // 🚜 3. EQUIPMENT & VEHICLES (Garage / Crafting)
+        // --------------------------------------
         'rusty-gear': { name: 'Rusty Gear', icon: '⚙️', cat: 'equipment', price: 50 },
         'magic-crystal': { name: 'Magic Crystal', icon: '🔮', cat: 'equipment', price: 250 },
-        'tractor-part': { name: 'Tractor Engine', icon: '🚜', cat: 'equipment', price: 1000 }
+        'tractor': { name: 'Farm Tractor', icon: '🚜', cat: 'equipment', price: 5000 },
+        'pickup': { name: 'Pickup Truck', icon: '🛻', cat: 'equipment', price: 8500 },
+        'delivery-van': { name: 'Delivery Van', icon: '🚚', cat: 'equipment', price: 12000 },
+        'cargo-truck': { name: 'Cargo Truck', icon: '🚛', cat: 'equipment', price: 25000 }
     }
 };
-
 // ==========================================
 // 🖼️ ANTI-BLACK SCREEN (IMAGE PRELOADER)
 // ==========================================
