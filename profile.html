@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Player Profile - My Cozy Farm</title>
+    
+    <!-- PRELOAD BACKGROUND -->
+    <link rel="preload" href="background.jpg" as="image">
+
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important;}
@@ -36,9 +40,9 @@
 
     /* --- PLAYER INFO CARD --- */
     .info-card { background: #6D4C41; border: 2px solid #4E342E; border-radius: 12px; padding: 12px; display: flex; gap: 15px; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); margin-bottom: 15px; }
-    .avatar-wrap { position: relative; width: 75px; height: 75px; background: #A1887F; border: 3px solid #FFD700; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+    .avatar-wrap { position: relative; width: 75px; height: 75px; background: #FFF; border: 3px solid #FFD700; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
     .avatar-wrap img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .lvl-badge { position: absolute; bottom: -8px; background: #FF5252; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 2px solid #fff; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .lvl-badge { position: absolute; bottom: -8px; background: #FF5252; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 2px solid #fff; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 5; }
     .p-details { flex: 1; line-height: 1.3; }
     .p-name { font-size: 18px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; margin: 0; display: flex; align-items: center; gap: 5px; }
     .vip-tag { background: linear-gradient(90deg, #FFD700, #FFA000); color: #000; font-size: 9px; padding: 2px 6px; border-radius: 4px; text-shadow: none; border: 1px solid #FFF; }
@@ -79,18 +83,20 @@
     .b-icon { font-size: 24px; }
     .b-txt { font-size: 9px; font-weight: 900; color: #3E2723; margin-top: 4px; line-height: 1.1; }
 
-    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    /* --- 🌟 TOAST NOTIFICATIONS CSS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    .toast-msg.info { background: rgba(30, 144, 255, 0.95); border-color: #0000CD; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+
+    /* --- OLD ALERT BOX (Kept fallback) --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
     .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
     .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
     .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
-    
-    .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
-    .alert-box.success .alert-title { color: #C8E6C9; }
-    .alert-box.error { border-color: #E53935; background: #C62828; }
-    .alert-box.error .alert-title { color: #FFCDD2; }
     .btn-gold-alert { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; text-shadow: none; font-size: 14px; padding: 10px; font-weight: 900; border-radius: 8px; cursor: pointer;}
     .btn-gold-alert:active { transform: translateY(2px); border-bottom-width: 2px; }
     </style>
@@ -98,16 +104,19 @@
 <body oncontextmenu="return false;">
 
     <div class="app-wrapper">
-        <div class="bg-overlay"></div> <!-- Blur Dark Overlay -->
+        <div class="bg-overlay"></div> 
+
+        <!-- TOAST CONTAINER -->
+        <div class="toast-container" id="toast-container"></div>
 
         <div class="profile-panel">
             
             <!-- HEADER -->
             <div class="header">
-                <!-- Changed to maingame.html -->
                 <button class="btn-red-back" id="back-btn"><span>⬅</span> Back</button>
                 <h2>Profile</h2>
-                <button class="btn-3d btn-blue" onclick="window.customAlert('Settings', 'Settings Menu Coming Soon!', 'normal')">⚙️</button>
+                <!-- 🔥 FIX: Linked to setting.html 🔥 -->
+                <button class="btn-3d btn-blue" onclick="setTimeout(() => window.location.href = 'setting.html', 150)">⚙️</button>
             </div>
 
             <!-- SCROLLABLE CONTENT -->
@@ -116,7 +125,8 @@
                 <!-- Player Info Card -->
                 <div class="info-card">
                     <div class="avatar-wrap">
-                        <img src="https://iili.io/CvagcQV.png" alt="🧑‍🌾" style="color:transparent; background:#555; text-align:center; line-height:75px; font-size:40px;">
+                        <!-- 🔥 FIX: ID added for brain.js to inject avatar 🔥 -->
+                        <img id="profile-avatar-img" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer1" alt="🧑‍🌾">
                         <div class="lvl-badge" id="profile-lvl">Lvl --</div>
                     </div>
                     <div class="p-details">
@@ -132,10 +142,10 @@
                     <div class="xp-bg"><div class="xp-fill" id="profile-xp-bar"></div></div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Action Buttons (Now uses Toast) -->
                 <div class="action-row">
-                    <button class="btn-3d btn-green" onclick="window.customAlert('Edit Profile', 'Profile Editing Coming Soon!', 'normal')">✏️ Edit Profile</button>
-                    <button class="btn-3d btn-gold" onclick="window.customAlert('Friends', 'Friends List feature will unlock at Level 5!', 'normal')">👥 Friends</button>
+                    <button class="btn-3d btn-green" onclick="window.showToast('Profile Editing Coming Soon!', 'info')">✏️ Edit Profile</button>
+                    <button class="btn-3d btn-gold" onclick="window.showToast('Friends feature unlocks at Level 5!', 'info')">👥 Friends</button>
                 </div>
 
                 <!-- Game Stats -->
@@ -152,7 +162,6 @@
                 <!-- Quick Inventory -->
                 <div class="sec-box">
                     <h3 class="sec-title">🎒 Top Resources</h3>
-                    <!-- Brain.js will populate this -->
                     <div class="inv" id="profile-inventory">
                         <!-- Loading... -->
                     </div>
@@ -163,7 +172,6 @@
                     <h3 class="sec-title">🏅 Badges</h3>
                     <div class="badges">
                         <div class="badge"><div class="b-icon">🏆</div><div class="b-txt">Beginner</div></div>
-                        <!-- More badges can be unlocked via brain.js later -->
                     </div>
                 </div>
 
@@ -171,7 +179,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM ALERT OVERLAY -->
+    <!-- OLD ALERT OVERLAY -->
     <div id="custom-alert-overlay" class="modal-overlay" style="z-index: 200;">
         <div id="custom-alert-box" class="alert-box">
             <h3 class="alert-title" id="alert-title">Notice</h3>
@@ -184,18 +192,28 @@
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
         
-        // Navigation
         document.getElementById('back-btn').addEventListener('click', function() {
             setTimeout(() => window.location.href = 'maingame.html', 150);
         });
 
-        // Copy ID Function
+        // 🌟 FAST TOAST NOTIFICATIONS 🌟
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            let icon = type === 'success' ? '✅' : '⏳';
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2000);
+        };
+
+        // COPY ID FUNCTION WITH TOAST
         window.copyPlayerId = function() {
             const idText = document.getElementById('profile-id').innerText;
             navigator.clipboard.writeText(idText).then(() => {
-                if(typeof window.customAlert === 'function') {
-                    window.customAlert("Copied!", `Your ID ${idText} has been copied to clipboard.`, "success");
-                }
+                window.showToast(`ID ${idText} Copied!`, 'success');
             });
         };
     </script>
