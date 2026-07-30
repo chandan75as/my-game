@@ -5,6 +5,12 @@
     <!-- PREVENT ZOOMING & SCALING -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Cozy Farm - Main Map</title>
+    
+    <!-- PRELOAD CRITICAL IMAGES SO NO BLACK SCREEN -->
+    <link rel="preload" href="background.jpg" as="image">
+    <link rel="preload" href="farm.png" as="image">
+    <link rel="preload" href="market.png" as="image">
+
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { 
@@ -187,12 +193,22 @@
         margin-bottom: 2px; 
         filter: brightness(0.9);
     }
+
+    /* --- 🌟 TOAST NOTIFICATIONS CSS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    .toast-msg.info { background: rgba(30, 144, 255, 0.95); border-color: #0000CD; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div class="app-wrapper">
         
+        <!-- TOAST CONTAINER -->
+        <div class="toast-container" id="toast-container"></div>
+
         <!-- GAME SCREEN (Map & Links) -->
         <div class="game-screen">
             
@@ -205,8 +221,9 @@
             </div>
 
             <div class="resources-ui">
-                <div class="res-item" id="coin-display">💰 --</div>
-                <div class="res-item" id="gem-display">💎 --</div>
+                <!-- 🔥 ID CHANGE: display se ui kar diya taaki saare pages pe same rahe 🔥 -->
+                <div class="res-item" id="coin-ui">🪙 --</div>
+                <div class="res-item" id="gem-ui">💎 --</div>
             </div>
 
             <a href="animalfarm.html" class="animalfarm-link clickable-item"><img src="animalfarm.png" alt="Animal Farm"></a>
@@ -226,7 +243,6 @@
             <!-- TOP LINE -->
             <div class="menu-row top-row">
                 <button class="btn-3d c-shop nav-btn" data-url="soon"><span>🛍️</span>Shop</button>
-                <!-- HOME BUTTON UPDATED TO MAINGAME.HTML -->
                 <button class="btn-circle-3d nav-btn" data-url="maingame.html">🏠</button>
                 <button class="btn-3d c-task nav-btn" data-url="task.html"><span>📋</span>Task</button>
             </div>
@@ -247,6 +263,20 @@
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
         
+        // --- 🌟 NEW TOAST FUNCTION 🌟 ---
+        window.showToast = function(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            let icon = type === 'success' ? '✅' : '⏳';
+            if (type === 'error') icon = '❌';
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2000);
+        };
+
         const allLinks = document.querySelectorAll('.clickable-item');
         allLinks.forEach(link => {
             link.addEventListener('click', function(event) {
@@ -267,7 +297,8 @@
                 const targetUrl = this.getAttribute('data-url');
                 setTimeout(() => {
                     if (targetUrl === 'soon') {
-                        alert('Coming Soon!');
+                        // REPLACE OLD ALERT WITH NICE TOAST
+                        window.showToast('Feature Coming Soon!', 'info');
                     } else {
                         window.location.href = targetUrl;
                     }
