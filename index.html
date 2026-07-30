@@ -5,20 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - My Cozy Farm</title>
     
-    <!-- Preload Background for smooth loading -->
     <link rel="preload" href="background.jpg" as="image">
     <link rel="preload" href="logo.jpg" as="image">
 
     <style>
-    /* --- APP-LIKE RESTRICTIONS --- */
-    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; outline: none !important; }
+    /* --- APP-LIKE RESTRICTIONS (BLUE HIGHLIGHT FIXED HERE) --- */
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; outline: none !important; -webkit-tap-highlight-color: transparent !important; }
     
     body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif; overflow: hidden; }
 
     /* --- GAME BACKGROUND --- */
     .app-wrapper { width: 100%; max-width: 500px; height: 100vh; display: flex; justify-content: center; align-items: center; background: url('background.jpg') center/cover; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
-    
-    /* ONLY 10% DARK/BLUR OVERLAY SO BACKGROUND IMAGE IS VISIBLE */
     .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); z-index: 1; backdrop-filter: blur(0.5px); }
 
     /* --- LOGIN PANEL --- */
@@ -28,10 +25,9 @@
         border-radius: 24px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; 
         box-shadow: 0 15px 35px rgba(0,0,0,0.8); animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
     @keyframes slideDown { 0% { transform: translateY(-50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
-    /* --- LOGO & TITLE SECTION (1.5x BIGGER ICON) --- */
+    /* --- LOGO --- */
     .logo-sec { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
     .logo-img { width: 135px; height: 135px; object-fit: cover; border-radius: 32px; border: 4px solid #FFD700; box-shadow: 0 8px 20px rgba(0,0,0,0.8); margin-bottom: 15px; background-color: #3E2723; }
     .logo-title { font-size: 38px; font-weight: 900; color: #FFD700; margin: 0; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1; text-shadow: -2px -2px 0 #3E2723, 2px -2px 0 #3E2723, -2px 2px 0 #3E2723, 2px 2px 0 #3E2723, 3px 4px 0 #5D4037, 4px 6px 4px rgba(0,0,0,0.8); }
@@ -47,20 +43,13 @@
     
     .view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
+    /* ALERT OVERLAY */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
-    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
+    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s; display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
-    .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
-    .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
-    
-    /* Dynamic Alert Colors */
-    .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
-    .alert-box.success .alert-title { color: #C8E6C9; }
-    .alert-box.error { border-color: #E53935; background: #C62828; }
-    .alert-box.error .alert-title { color: #FFCDD2; }
-
+    .alert-title { font-size: 20px; font-weight: 900; color: #FFF; margin: 0; }
+    .alert-msg { font-size: 13px; color: #FFECB3; margin: 0; font-weight: bold; }
     .btn-gold-alert { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; font-weight: 900; border-radius: 8px; cursor: pointer; padding: 10px; width: 100%; font-size: 15px;}
     .btn-gold-alert:active { transform: translateY(2px); border-bottom-width: 2px; }
     </style>
@@ -77,9 +66,8 @@
                 <h1 class="logo-title">Cozy<br>Farm</h1>
             </div>
 
-            <!-- ================= GOOGLE LOGIN ONLY VIEW ================= -->
+            <!-- GOOGLE LOGIN -->
             <div id="view-login" class="view-section">
-                <!-- ID changed slightly to connect with brain.js clean logic -->
                 <button class="btn-3d btn-google" id="btn-login-trigger">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -90,9 +78,7 @@
                 </button>
             </div>
 
-            <!-- Loading Status -->
             <div id="loading-text">Connecting... 📡</div>
-
         </div>
     </div>
 
@@ -105,7 +91,6 @@
         </div>
     </div>
 
-    <!-- UI Interaction Script (Visuals Only) -->
     <script>
         document.addEventListener('gesturestart', e => e.preventDefault());
         
@@ -113,7 +98,7 @@
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
             const box = document.getElementById('custom-alert-box');
-            box.className = `alert-box ${type}`; // Support for 'error', 'success' CSS
+            box.className = `alert-box ${type}`; 
             document.getElementById('custom-alert-overlay').classList.add('show');
         };
 
@@ -135,7 +120,7 @@
         };
     </script>
 
-    <!-- CONNECTING TO THE BRAIN ENGINE FOR ACTUAL LOGIC -->
+    <!-- BRAIN.JS -->
     <script type="module" src="brain.js"></script>
 
 </body>
