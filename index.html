@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - My Cozy Farm</title>
+    
+    <!-- Preload Background for smooth loading -->
+    <link rel="preload" href="background.jpg" as="image">
+    <link rel="preload" href="logo.jpg" as="image">
+
     <style>
     /* --- APP-LIKE RESTRICTIONS --- */
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; outline: none !important; }
@@ -13,58 +18,50 @@
     /* --- GAME BACKGROUND --- */
     .app-wrapper { width: 100%; max-width: 500px; height: 100vh; display: flex; justify-content: center; align-items: center; background: url('background.jpg') center/cover; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.9); }
     
-    /* 70% CLEAR OVERLAY */
-    .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 1; backdrop-filter: blur(1px); }
+    /* ONLY 10% DARK/BLUR OVERLAY SO BACKGROUND IMAGE IS VISIBLE */
+    .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); z-index: 1; backdrop-filter: blur(0.5px); }
 
-    /* --- 100% INVISIBLE LOGIN PANEL --- */
+    /* --- LOGIN PANEL --- */
     .login-box { 
         position: relative; z-index: 2; width: 85%; max-width: 340px; 
         background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.2); 
-        border-radius: 24px; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; 
+        border-radius: 24px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; 
         box-shadow: 0 15px 35px rgba(0,0,0,0.8); animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     @keyframes slideDown { 0% { transform: translateY(-50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
-    /* --- LOGO & TITLE SECTION --- */
-    .logo-sec { text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-    .logo-img { width: 90px; height: 90px; object-fit: cover; border-radius: 22px; border: 3px solid #FFD700; box-shadow: 0 8px 20px rgba(0,0,0,0.8); margin-bottom: 10px; background-color: #3E2723; }
+    /* --- LOGO & TITLE SECTION (1.5x BIGGER ICON) --- */
+    .logo-sec { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
+    .logo-img { width: 135px; height: 135px; object-fit: cover; border-radius: 32px; border: 4px solid #FFD700; box-shadow: 0 8px 20px rgba(0,0,0,0.8); margin-bottom: 15px; background-color: #3E2723; }
     .logo-title { font-size: 38px; font-weight: 900; color: #FFD700; margin: 0; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1; text-shadow: -2px -2px 0 #3E2723, 2px -2px 0 #3E2723, -2px 2px 0 #3E2723, 2px 2px 0 #3E2723, 3px 4px 0 #5D4037, 4px 6px 4px rgba(0,0,0,0.8); }
 
-    /* --- INPUT FIELDS --- */
-    .input-group { width: 100%; margin-bottom: 12px; position: relative; }
-    .input-group input { width: 100%; padding: 12px 15px; border-radius: 12px; background: rgba(0,0,0,0.6); border: 2px solid #5D4037; color: #FFF; font-weight: bold; font-size: 14px; transition: 0.2s; text-align: center; }
-    .input-group input::placeholder { color: #A1887F; font-weight: normal; }
-    .input-group input:focus { border-color: #FFD700; background: rgba(0,0,0,0.8); }
-
     /* --- 3D BUTTONS --- */
-    .btn-3d { width: 100%; border-radius: 12px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.1s; border: none; padding: 12px 0; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.4); margin-bottom: 10px; }
-    .btn-3d:active { transform: translateY(4px); border-bottom-width: 2px !important; margin-bottom: 14px; }
+    .btn-3d { width: 100%; border-radius: 12px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.1s; border: none; padding: 14px 0; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+    .btn-3d:active { transform: translateY(4px); border-bottom-width: 2px !important; margin-bottom: 4px; }
     
-    .btn-login { background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 6px solid #2E7D32; }
-    .btn-signup { background: #1E90FF; border: 2px solid #0D47A1; border-bottom: 6px solid #0D47A1; }
-    .btn-google { background: #FFF; border: 2px solid #B0BEC5; border-bottom: 6px solid #90A4AE; color: #424242; text-shadow: none; margin-bottom: 0; }
+    .btn-google { background: #FFF; border: 2px solid #B0BEC5; border-bottom: 6px solid #90A4AE; color: #424242; text-shadow: none; }
     
-    /* --- LINKS & TEXT --- */
-    .text-link { color: #FFD700; font-size: 12px; font-weight: bold; cursor: pointer; text-shadow: 1px 1px 2px #000; text-decoration: underline; margin-top: 5px; }
-    .divider { display: flex; align-items: center; width: 100%; margin: 15px 0; color: #FFECB3; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 2px; background: rgba(255, 255, 255, 0.3); margin: 0 12px; border-radius: 2px; }
     #loading-text { color: #00E5FF; font-weight: bold; font-size: 14px; margin-top: 15px; text-shadow: 1px 1px 2px #000; display: none; animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     
-    /* View Toggle Classes */
     .view-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
-    .hidden { display: none !important; }
 
-    /* CUSTOM ALERT BOX */
+    /* --- NEW COLORFUL CUSTOM ALERT BOX --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
-    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s; display: flex; flex-direction: column; gap: 15px; }
+    .alert-box { background: #5D4037; border: 4px solid #4E342E; border-radius: 16px; width: 80%; max-width: 320px; text-align: center; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 15px; }
     .modal-overlay.show .alert-box { transform: scale(1); }
-    .alert-title { font-size: 20px; font-weight: 900; color: #FFF; margin: 0; }
-    .alert-msg { font-size: 13px; color: #FFECB3; margin: 0; font-weight: bold; }
+    .alert-title { font-size: 22px; font-weight: 900; color: #FFF; text-shadow: 1px 1px 3px #000; margin: 0; }
+    .alert-msg { font-size: 14px; color: #FFECB3; margin: 0; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); line-height: 1.4; }
+    
+    /* Dynamic Alert Colors */
     .alert-box.success { border-color: #4CAF50; background: #2E7D32; }
+    .alert-box.success .alert-title { color: #C8E6C9; }
     .alert-box.error { border-color: #E53935; background: #C62828; }
-    .btn-gold-alert { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; font-weight: 900; border-radius: 8px; cursor: pointer; padding: 10px; width: 100%; }
+    .alert-box.error .alert-title { color: #FFCDD2; }
+
+    .btn-gold-alert { background: #FFCA28; border: 2px solid #FF8F00; border-bottom: 4px solid #FF8F00; color: #333; font-weight: 900; border-radius: 8px; cursor: pointer; padding: 10px; width: 100%; font-size: 15px;}
     .btn-gold-alert:active { transform: translateY(2px); border-bottom-width: 2px; }
     </style>
 </head>
@@ -80,21 +77,10 @@
                 <h1 class="logo-title">Cozy<br>Farm</h1>
             </div>
 
-            <!-- ================= LOGIN VIEW ================= -->
+            <!-- ================= GOOGLE LOGIN ONLY VIEW ================= -->
             <div id="view-login" class="view-section">
-                <div class="input-group">
-                    <input type="email" id="login-email" placeholder="Email Address">
-                </div>
-                <div class="input-group">
-                    <input type="password" id="login-pass" placeholder="Password">
-                </div>
-                
-                <button class="btn-3d btn-login" id="btn-login-submit"><span>🔓</span> Login</button>
-                <div class="text-link" onclick="switchView('view-forgot')">Forgot Password?</div>
-                
-                <div class="divider"><span>OR</span></div>
-
-                <button class="btn-3d btn-google" id="btn-google-login">
+                <!-- ID changed slightly to connect with brain.js clean logic -->
+                <button class="btn-3d btn-google" id="btn-login-trigger">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                         <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
@@ -102,31 +88,10 @@
                         <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
                     </svg> Continue with Google
                 </button>
-
-                <div class="text-link" style="margin-top: 15px;" onclick="switchView('view-signup')">New Player? Create Account</div>
-            </div>
-
-            <!-- ================= SIGN UP VIEW ================= -->
-            <div id="view-signup" class="view-section hidden">
-                <div class="input-group"><input type="email" id="signup-email" placeholder="Email Address"></div>
-                <div class="input-group"><input type="password" id="signup-pass" placeholder="Create Password"></div>
-                <div class="input-group"><input type="password" id="signup-confirm" placeholder="Confirm Password"></div>
-                
-                <button class="btn-3d btn-signup" id="btn-signup-submit"><span>📝</span> Register</button>
-                <div class="text-link" style="margin-top: 15px;" onclick="switchView('view-login')">Back to Login</div>
-            </div>
-
-            <!-- ================= FORGOT PASS VIEW ================= -->
-            <div id="view-forgot" class="view-section hidden">
-                <p style="color:#FFF; font-size:12px; text-align:center; font-weight:bold;">Enter your email to reset password</p>
-                <div class="input-group"><input type="email" id="reset-email" placeholder="Email Address"></div>
-                
-                <button class="btn-3d btn-login" id="btn-reset-submit"><span>📧</span> Send Reset Link</button>
-                <div class="text-link" style="margin-top: 15px;" onclick="switchView('view-login')">Cancel</div>
             </div>
 
             <!-- Loading Status -->
-            <div id="loading-text">Connecting to Server... 📡</div>
+            <div id="loading-text">Connecting... 📡</div>
 
         </div>
     </div>
@@ -140,41 +105,15 @@
         </div>
     </div>
 
-    <!-- UI & FIREBASE SCRIPT -->
-    <script type="module">
-        // 1. Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-        // 2. Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAFpOWJlCYTvlhVijnyOPeVn0wCw7Ev5tI",
-            authDomain: "my-cozy-farm.firebaseapp.com",
-            databaseURL: "https://my-cozy-farm-default-rtdb.firebaseio.com",
-            projectId: "my-cozy-farm",
-            storageBucket: "my-cozy-farm.firebasestorage.app",
-            messagingSenderId: "680824081334",
-            appId: "1:680824081334:web:94e41cc91d41ef862d4f17",
-            measurementId: "G-XQN1JNEW1E"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const googleProvider = new GoogleAuthProvider();
-
-        // 3. UI Toggles & Alerts
-        window.switchView = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
-        };
-
+    <!-- UI Interaction Script (Visuals Only) -->
+    <script>
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        
         window.customAlert = function(title, msg, type = 'normal') {
             document.getElementById('alert-title').innerText = title;
             document.getElementById('alert-msg').innerText = msg;
             const box = document.getElementById('custom-alert-box');
-            box.className = `alert-box ${type}`;
+            box.className = `alert-box ${type}`; // Support for 'error', 'success' CSS
             document.getElementById('custom-alert-overlay').classList.add('show');
         };
 
@@ -182,116 +121,22 @@
             document.getElementById('custom-alert-overlay').classList.remove('show');
         };
 
-        function showLoading(show, text="Loading...") {
+        window.showLoading = function(show, text="Loading...") {
             const loader = document.getElementById('loading-text');
-            loader.innerText = text;
-            loader.style.display = show ? 'block' : 'none';
-        }
-
-        // 4. Default Game Data Template (Naye player ke liye)
-        const DEFAULT_DATA = {
-            playerName: "New Farmer",
-            vipLevel: 0, level: 1, xp: 0, maxXp: 100, coins: 500, gems: 50, storage: 0, maxStorage: 5,
-            equippedTool: { type: null, id: null, icon: '✋', name: 'None' },
-            stats: { cropsHarvested: 0, totalEarnings: 0, animalsOwned: 0, daysPlayed: 1 },
-            inventory: { 'seed-wheat': 3, 'wheat': 0 },
-            marketInventory: {}, 
-            farmPlots: [
-                { id: 1, state: 'raw', seedId: null, timeLeft: 0 },
-                { id: 2, state: 'raw', seedId: null, timeLeft: 0 },
-                { id: 3, state: 'raw', seedId: null, timeLeft: 0 }
-            ],
-            lastSaved: Date.now()
+            const btn = document.getElementById('view-login');
+            if (show) {
+                loader.innerText = text;
+                loader.style.display = 'block';
+                btn.style.display = 'none';
+            } else {
+                loader.style.display = 'none';
+                btn.style.display = 'flex';
+            }
         };
-
-        // Create Database Entry for New Player
-        async function checkAndCreateUserData(user) {
-            const dbRef = ref(db);
-            const snapshot = await get(child(dbRef, `players/${user.uid}`));
-            if (!snapshot.exists()) {
-                let newData = DEFAULT_DATA;
-                // Agar google se login kiya hai toh uski email name set kardo
-                if(user.displayName) newData.playerName = user.displayName.split(" ")[0]; 
-                newData.playerId = "#" + user.uid.substring(0,6).toUpperCase();
-                await set(ref(db, `players/${user.uid}`), newData);
-            }
-            // Save UID local storage me taaki brain.js isko fetch kar sake
-            localStorage.setItem('myCozyFarm_UID', user.uid); 
-            window.location.href = 'maingame.html';
-        }
-
-        // 5. Authentication Logic
-
-        // Auto-Login check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                showLoading(true, "Logging in automatically...");
-                localStorage.setItem('myCozyFarm_UID', user.uid);
-                window.location.href = 'maingame.html';
-            }
-        });
-
-        // Email/Pass Login
-        document.getElementById('btn-login-submit').addEventListener('click', () => {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            if(!email || !pass) return customAlert("Error", "Please enter email and password!", "error");
-            
-            showLoading(true, "Authenticating...");
-            signInWithEmailAndPassword(auth, email, pass).then((userCredential) => {
-                localStorage.setItem('myCozyFarm_UID', userCredential.user.uid);
-                window.location.href = 'maingame.html';
-            }).catch((error) => {
-                showLoading(false);
-                customAlert("Login Failed", error.message.replace("Firebase: ", ""), "error");
-            });
-        });
-
-        // Email/Pass Signup
-        document.getElementById('btn-signup-submit').addEventListener('click', () => {
-            const email = document.getElementById('signup-email').value;
-            const pass = document.getElementById('signup-pass').value;
-            const conf = document.getElementById('signup-confirm').value;
-            
-            if(!email || !pass) return customAlert("Error", "All fields are required!", "error");
-            if(pass !== conf) return customAlert("Error", "Passwords do not match!", "error");
-            if(pass.length < 6) return customAlert("Error", "Password must be at least 6 characters!", "error");
-
-            showLoading(true, "Creating your Farm...");
-            createUserWithEmailAndPassword(auth, email, pass).then((userCredential) => {
-                checkAndCreateUserData(userCredential.user);
-            }).catch((error) => {
-                showLoading(false);
-                customAlert("Signup Failed", error.message.replace("Firebase: ", ""), "error");
-            });
-        });
-
-        // Google Login
-        document.getElementById('btn-google-login').addEventListener('click', () => {
-            showLoading(true, "Waiting for Google...");
-            signInWithPopup(auth, googleProvider).then((result) => {
-                checkAndCreateUserData(result.user);
-            }).catch((error) => {
-                showLoading(false);
-                customAlert("Google Login Failed", error.message.replace("Firebase: ", ""), "error");
-            });
-        });
-
-        // Forgot Password
-        document.getElementById('btn-reset-submit').addEventListener('click', () => {
-            const email = document.getElementById('reset-email').value;
-            if(!email) return customAlert("Error", "Please enter your email!", "error");
-
-            showLoading(true, "Sending link...");
-            sendPasswordResetEmail(auth, email).then(() => {
-                showLoading(false);
-                customAlert("Success", "Password reset link sent to your email!", "success");
-                switchView('view-login');
-            }).catch((error) => {
-                showLoading(false);
-                customAlert("Error", error.message.replace("Firebase: ", ""), "error");
-            });
-        });
     </script>
+
+    <!-- CONNECTING TO THE BRAIN ENGINE FOR ACTUAL LOGIC -->
+    <script type="module" src="brain.js"></script>
+
 </body>
 </html>
