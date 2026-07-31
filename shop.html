@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shop - My Cozy Farm</title>
+
+    <!-- PRELOAD BACKGROUND -->
+    <link rel="preload" href="background.jpg" as="image">
+
+    <style>
+    /* --- APP-LIKE RESTRICTIONS --- */
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent !important; outline: none !important; }
+    
+    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; font-family: sans-serif; overflow: hidden; }
+
+    /* --- GAME BACKGROUND WITH DARK OVERLAY --- */
+    .app-wrapper { width: 100%; max-width: 500px; height: 100vh; display: flex; flex-direction: column; background: url('background.jpg') center/cover; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.9); padding-bottom: 10px; }
+    .bg-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.75); z-index: 1; backdrop-filter: blur(3px); }
+
+    /* --- 3D WOODEN PANEL --- */
+    .shop-panel { position: relative; z-index: 2; margin: 15px; flex: 1; background: #8D6E63; border: 4px solid #4E342E; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.4); }
+    
+    /* Header */
+    .header { background: #1565C0; border-bottom: 4px solid #0D47A1; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+    .header h2 { margin: 0; font-size: 18px; color: #FFF; text-shadow: 2px 2px 3px #000; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-red-back { background: #E53935; border: 2px solid #B71C1C; border-bottom: 4px solid #B71C1C; padding: 6px 12px; font-size: 12px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; transition: all 0.1s; }
+    .btn-red-back:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; }
+    
+    /* Resources Container */
+    .res-container { display: flex; gap: 5px; }
+    .mini-res { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 12px; color: white; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 3px; border: 1px solid #FFD700; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+    .res-gem { border-color: #00E5FF; }
+
+    /* --- TABS --- */
+    .tabs { display: flex; gap: 4px; padding: 10px 10px 0 10px; background: rgba(0,0,0,0.2); }
+    .tab-btn { flex: 1; background: #6D4C41; border: 2px solid #4E342E; border-bottom: 4px solid #4E342E; border-radius: 8px 8px 0 0; padding: 8px 0; color: #D7CCC8; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.1s; display: flex; justify-content: center; align-items: center; gap: 4px; }
+    .tab-btn.active { background: #8D6E63; color: #FFF; border-color: #FFD700; border-bottom-color: #8D6E63; border-bottom-width: 0; padding-bottom: 12px; transform: translateY(2px); text-shadow: 1px 1px 2px #000; }
+    
+    /* SPECIAL VIP TAB STYLE */
+    .tab-vip { background: #3E2723; color: #FFD700; border-color: #FF8F00; border-bottom-color: #FF8F00; }
+    .tab-vip.active { background: linear-gradient(180deg, #FFD700 0%, #FF8F00 100%); color: #3E2723; border-color: #FFF; text-shadow: none; box-shadow: 0 -4px 10px rgba(255,215,0,0.5); }
+
+    /* --- SCROLLABLE ITEMS GRID --- */
+    .content { padding: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; align-content: start; flex: 1; overflow-y: auto; min-height: 0; }
+    .content::-webkit-scrollbar { display: none; }
+
+    /* --- ITEM CARDS FOR BUYING --- */
+    .item-card { background: #5D4037; border: 3px inset #4E342E; border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+    .item-icon { font-size: 45px; margin-bottom: 5px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
+    .item-name { font-size: 12px; color: #FFF; font-weight: bold; text-shadow: 1px 1px 1px #000; margin-bottom: 10px; text-align: center; }
+    
+    /* 3D Buy Buttons */
+    .btn-buy { width: 100%; border-radius: 8px; font-weight: 900; color: #fff; cursor: pointer; text-shadow: 1px 1px 1px rgba(0,0,0,0.8); transition: transform 0.1s; border: none; padding: 8px 0; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 4px; background: #4CAF50; border: 2px solid #2E7D32; border-bottom: 4px solid #2E7D32; }
+    .btn-buy:active { transform: translateY(3px); border-bottom-width: 2px !important; margin-bottom: 2px; }
+
+    /* --- 🌟 VIP EXCLUSIVE CARDS 🌟 --- */
+    .vip-card { background: linear-gradient(135deg, #3E2723, #271610); border: 3px solid #FFD700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), inset 0 0 10px rgba(255, 215, 0, 0.2); animation: vipGlow 2s infinite alternate; }
+    .vip-card .item-name { color: #FFD700; text-transform: uppercase; }
+    .btn-buy-gem { background: #9C27B0; border-color: #6A1B9A; border-bottom-color: #6A1B9A; }
+    @keyframes vipGlow { 0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); } 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); border-color: #FFF; } }
+
+    /* --- 🌟 TOAST NOTIFICATIONS CSS 🌟 --- */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast-msg { background: rgba(46, 125, 50, 0.95); border: 2px solid #4CAF50; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; text-shadow: 1px 1px 1px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fadeInOut 2s ease-in-out forwards; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .toast-msg.error { background: rgba(198, 40, 40, 0.95); border-color: #E53935; }
+    .toast-msg.info { background: rgba(30, 144, 255, 0.95); border-color: #0000CD; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="app-wrapper">
+        <div class="bg-overlay"></div> 
+
+        <!-- TOAST CONTAINER -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <div class="shop-panel">
+            
+            <!-- HEADER -->
+            <div class="header">
+                <button class="btn-red-back" id="back-btn"><span>⬅</span> Back</button>
+                <h2>🛒 Shop</h2>
+                <div class="res-container">
+                    <div class="mini-res" id="coin-ui">🪙 --</div>
+                    <div class="mini-res res-gem" id="gem-ui">💎 --</div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="tabs">
+                <div class="tab-btn active" data-cat="seeds">🌱 Seeds</div>
+                <div class="tab-btn" data-cat="equipment">🚜 Equipment</div> 
+                <div class="tab-btn tab-vip" data-cat="vip">👑 VIP</div> 
+            </div>
+
+            <!-- SHOP GRID -->
+            <div class="content" id="shop-grid">
+                <!-- Shop items will load here -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- UI VISUAL LOGIC -->
+    <script>
+        document.addEventListener('gesturestart', e => e.preventDefault());
+
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.getElementById('back-btn').addEventListener('click', function() {
+            setTimeout(() => window.location.href = 'maingame.html', 150);
+        });
+
+        // 🌟 FAST TOAST NOTIFICATIONS 🌟
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            
+            let icon = type === 'success' ? '🛍️' : '❌'; 
+            toast.innerHTML = `${icon} ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2000);
+        };
+    </script>
+
+    <!-- LOAD BRAIN ENGINE FIRST -->
+    <script type="module" src="brain.js?v=1000"></script>
+
+    <!-- SHOP SPECIFIC LOGIC (Auto-loads once brain.js confirms data) -->
+    <script>
+        let currentShopCat = 'seeds';
+
+        // Custom Shop Catalog with Buy Prices (Separate from Selling Price)
+        const SHOP_CATALOG = {
+            'seeds': [
+                { id: 'seed-wheat', price: 2, cur: 'coin' },
+                { id: 'seed-corn', price: 4, cur: 'coin' },
+                { id: 'seed-tomato', price: 6, cur: 'coin' },
+                { id: 'seed-carrot', price: 5, cur: 'coin' },
+                { id: 'seed-potato', price: 8, cur: 'coin' },
+                { id: 'seed-chili', price: 9, cur: 'coin' },
+                { id: 'seed-strawberry', price: 12, cur: 'coin' },
+                { id: 'seed-watermelon', price: 20, cur: 'coin' },
+                { id: 'seed-grapes', price: 15, cur: 'coin' },
+                { id: 'seed-mango', price: 25, cur: 'coin' }
+            ],
+            'equipment': [
+                { id: 'rusty-gear', price: 250, cur: 'coin' },
+                { id: 'tractor', price: 5000, cur: 'coin' },
+                { id: 'pickup', price: 8500, cur: 'coin' },
+                { id: 'delivery-van', price: 12000, cur: 'coin' },
+                { id: 'cargo-truck', price: 25000, cur: 'coin' }
+            ],
+            'vip': [
+                // Special items that cost Gems!
+                { id: 'magic-crystal', overrideName: 'Magic Crystal', icon: '🔮', price: 50, cur: 'gem' },
+                { id: 'mystery-box', overrideName: 'Mystery Box', icon: '🎁', price: 100, cur: 'gem' },
+                { id: 'golden-tractor', overrideName: 'Golden Tractor', icon: '🚜', price: 500, cur: 'gem' },
+                { id: 'vip-crown', overrideName: 'King Crown', icon: '👑', price: 1000, cur: 'gem' }
+            ]
+        };
+
+        // Wait for Brain.js to load GameData
+        let waitInterval = setInterval(() => {
+            if (window.GameData && window.GAME_DB) {
+                clearInterval(waitInterval);
+                initShopLogic();
+            }
+        }, 100);
+
+        function initShopLogic() {
+            window.renderShop = function() {
+                const grid = document.getElementById('shop-grid');
+                grid.innerHTML = '';
+                
+                let itemsList = SHOP_CATALOG[currentShopCat];
+
+                itemsList.forEach(shopItem => {
+                    // Fetch real icon and name from GAME_DB if not overridden in VIP
+                    let masterItems = { ...window.GAME_DB.Seeds, ...window.GAME_DB.Items };
+                    let dbInfo = masterItems[shopItem.id] || {};
+                    
+                    let name = shopItem.overrideName || dbInfo.name || 'Unknown Item';
+                    let icon = shopItem.icon || dbInfo.icon || '📦';
+                    
+                    let costTxt = shopItem.cur === 'coin' ? `🪙 ${shopItem.price}` : `💎 ${shopItem.price}`;
+                    let btnClass = shopItem.cur === 'gem' ? 'btn-buy btn-buy-gem' : 'btn-buy';
+                    let cardClass = currentShopCat === 'vip' ? 'item-card vip-card' : 'item-card';
+
+                    grid.innerHTML += `
+                        <div class="${cardClass}">
+                            <div class="item-icon">${icon}</div>
+                            <div class="item-name">${name}</div>
+                            <button class="${btnClass}" onclick="window.buyItem('${shopItem.id}', ${shopItem.price}, '${shopItem.cur}', '${name}')">
+                                Buy 1x (${costTxt})
+                            </button>
+                        </div>
+                    `;
+                });
+            };
+
+            // Purchase Function
+            window.buyItem = function(id, price, currency, itemName) {
+                // 1. Check Space
+                if (window.GameData.storage >= window.GameData.maxStorage) {
+                    return window.showToast("Storage Bag is Full!", "error");
+                }
+
+                // 2. Check Balance & Deduct
+                if (currency === 'coin') {
+                    if (window.GameData.coins < price) return window.showToast(`Not enough Coins for ${itemName}!`, "error");
+                    window.GameData.coins -= price;
+                } else if (currency === 'gem') {
+                    if (window.GameData.gems < price) return window.showToast(`Not enough Gems for ${itemName}!`, "error");
+                    window.GameData.gems -= price;
+                }
+
+                // 3. Add to Inventory
+                if (!window.GameData.inventory) window.GameData.inventory = {};
+                window.GameData.inventory[id] = (window.GameData.inventory[id] || 0) + 1;
+
+                // 4. Save and Update UI
+                window.saveGameData();
+                window.updateGlobalUI();
+                
+                window.showToast(`Purchased ${itemName}!`, "success");
+            };
+
+            // Event Listeners for Tabs
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.addEventListener('click', function() { 
+                    currentShopCat = this.getAttribute('data-cat'); 
+                    window.renderShop(); 
+                });
+            });
+
+            // Initial Render
+            window.renderShop();
+        }
+    </script>
+</body>
+</html>
