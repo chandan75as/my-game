@@ -1,5 +1,5 @@
 // ==========================================
-// 🧠 BRAIN.JS - 1000% PERFECT HYBRID ENGINE
+// 🧠 BRAIN.JS - ZERO-LAG & BUG-FREE ENGINE
 // ==========================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -9,7 +9,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from
 document.addEventListener('gesturestart', e => e.preventDefault());
 
 // ==========================================
-// 📚 GLOBAL GAME DATABASE (SARA EMOJI YAHI HAI)
+// 📚 GLOBAL GAME DATABASE
 // ==========================================
 window.GAME_DB = {
     Tools: [
@@ -103,16 +103,13 @@ let needsCloudSync = false;
 function getDefaultData(uid) {
     return {
         playerName: "Farmer", playerId: uid, profilePic: "https://api.dicebear.com/7.x/avataaars/svg?seed=Farmer1",
-        vipLevel: 0, level: 1, xp: 0, maxXp: 100, coins: 2000, gems: 1500, storage: 0, maxStorage: 500, // Capacity badha di test ke liye
+        vipLevel: 0, level: 1, xp: 0, maxXp: 100, coins: 2000, gems: 1500, storage: 0, maxStorage: 500, 
         equippedTool: { type: null, id: null, icon: '✋', name: 'None' },
         stats: { cropsHarvested: 0, totalEarnings: 0, animalsOwned: 0, daysPlayed: 1 },
-        inventory: { 'seed-wheat': 5, 'seed-tomato': 2, 'wheat': 1 }, 
+        inventory: { 'seed-wheat': 5, 'wheat': 1 }, 
         marketInventory: {}, 
-        farmPlots: [
-            { id: 1, state: 'raw', seedId: null, readyAt: null },
-            { id: 2, state: 'raw', seedId: null, readyAt: null },
-            { id: 3, state: 'raw', seedId: null, readyAt: null }
-        ], lastSaved: Date.now()
+        farmPlots: [ { id: 1, state: 'raw', seedId: null, readyAt: null }, { id: 2, state: 'raw', seedId: null, readyAt: null }, { id: 3, state: 'raw', seedId: null, readyAt: null } ], 
+        lastSaved: Date.now()
     };
 }
 
@@ -122,28 +119,58 @@ function calculateTotalStorage(inv) {
     return total;
 }
 
-async function loadGameData() {
+// 🔥 FIX 1: INSTANT LOAD SYSTEM (NO WAITING FOR FIREBASE) 🔥
+function loadGameData(initCallback) {
     let localKey = `myCozyFarmData_${PLAYER_ID}`;
     let localSaved = localStorage.getItem(localKey);
     let localData = localSaved ? JSON.parse(localSaved) : null;
+    let isUIInitialized = false;
 
-    if (localData) { window.GameData = localData; window.updateGlobalUI(); }
+    // Load instantly from Local Storage
+    if (localData) {
+        window.GameData = localData;
+        if (!window.GameData.marketInventory) window.GameData.marketInventory = {}; // Safety Check
+        if (!window.GameData.inventory) window.GameData.inventory = {}; // Safety Check
+        initCallback(); 
+        isUIInitialized = true;
+    }
 
-    try {
-        const snapshot = await get(child(ref(db), `players/${PLAYER_ID}`));
+    // Check Cloud in Background
+    get(child(ref(db), `players/${PLAYER_ID}`)).then((snapshot) => {
         if (snapshot.exists()) {
             let cloudData = snapshot.val();
             if (!localData || (cloudData.lastSaved && cloudData.lastSaved > (localData.lastSaved || 0))) {
-                window.GameData = cloudData; saveToLocalOnly(); window.updateGlobalUI();
-                if(typeof window.renderPlots === 'function') window.renderPlots();
-            } else if (localData && localData.lastSaved > (cloudData.lastSaved || 0)) { needsCloudSync = true; }
+                window.GameData = cloudData;
+                if (!window.GameData.marketInventory) window.GameData.marketInventory = {}; // Safety Check
+                if (!window.GameData.inventory) window.GameData.inventory = {}; // Safety Check
+                saveToLocalOnly();
+                
+                if (!isUIInitialized) {
+                    initCallback();
+                    isUIInitialized = true;
+                } else {
+                    // Update running UI in background
+                    window.updateGlobalUI();
+                    if(typeof window.renderPlots === 'function') window.renderPlots();
+                    if(typeof window.refreshStorage === 'function') window.refreshStorage();
+                    if(typeof window.refreshMarket === 'function') window.refreshMarket();
+                }
+            } else if (localData && localData.lastSaved > (cloudData.lastSaved || 0)) {
+                needsCloudSync = true;
+            }
         } else if (!localData) {
-            window.GameData = getDefaultData(PLAYER_ID); saveToLocalOnly(); needsCloudSync = true;
+            window.GameData = getDefaultData(PLAYER_ID);
+            saveToLocalOnly(); needsCloudSync = true;
+            if (!isUIInitialized) { initCallback(); isUIInitialized = true; }
         }
-    } catch (error) {
-        if (!localData) window.GameData = getDefaultData(PLAYER_ID);
-    }
-    return window.GameData;
+    }).catch((e) => {
+        if (!isUIInitialized) {
+            window.GameData = localData || getDefaultData(PLAYER_ID);
+            if (!window.GameData.marketInventory) window.GameData.marketInventory = {};
+            if (!window.GameData.inventory) window.GameData.inventory = {};
+            initCallback();
+        }
+    });
 }
 
 function saveToLocalOnly() {
@@ -184,18 +211,12 @@ function notify(msg, type="success") {
     else alert(msg);
 }
 
-// 🔥 CHEAT CODE TO TEST EMOJIS 🔥
+// CHEAT CODE
 window.GiveMeEverything = function() {
     let masterItems = { ...window.GAME_DB.Seeds, ...window.GAME_DB.Items };
-    for(let id in masterItems) {
-        window.GameData.inventory[id] = 10; // Give 10 of EVERYTHING
-    }
-    window.saveGameData();
-    window.updateGlobalUI();
-    if(typeof initStorageLogic === 'function') {
-        document.getElementById('inventory-grid').innerHTML = '';
-        initStorageLogic();
-    }
+    for(let id in masterItems) window.GameData.inventory[id] = 10;
+    window.saveGameData(); window.updateGlobalUI();
+    if(typeof window.refreshStorage === 'function') window.refreshStorage();
     notify("God Mode Activated! Check Storage!", "success");
 };
 
@@ -214,20 +235,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
         if (user) {
             PLAYER_ID = user.uid; 
-            await loadGameData(); 
-            window.updateGlobalUI();
-
             if (window.location.href.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
                 window.location.href = "maingame.html"; return; 
             }
 
-            if (document.getElementById('main-farm')) initFarmLogic();
-            else if (document.getElementById('inventory-grid')) initStorageLogic();
-            else if (document.getElementById('market-grid')) initMarketLogic();
-            else if (document.getElementById('profile-name')) initProfileLogic();
+            // 🔥 LOAD FAST AND START GAME IMMEDIATELY 🔥
+            loadGameData(() => {
+                window.updateGlobalUI();
+                if (document.getElementById('main-farm')) initFarmLogic();
+                else if (document.getElementById('inventory-grid')) initStorageLogic();
+                else if (document.getElementById('market-grid')) initMarketLogic();
+                else if (document.getElementById('profile-name')) initProfileLogic();
+            });
+
         } else {
             if (!window.location.href.includes('index.html')) window.location.href = "index.html"; 
         }
@@ -256,7 +279,6 @@ function initFarmLogic() {
     window.renderPlots = function() {
         const grid = document.getElementById('main-farm');
         if (!grid) return; grid.innerHTML = '';
-
         window.farmPlots.forEach((plot, index) => {
             let html = '';
             if(plot.state === 'raw') html = `<div class="plot raw" onclick="window.clickPlot(${index})"><div class="plot-icon"></div><div class="plot-tag">Raw Land</div></div>`;
@@ -280,8 +302,7 @@ function initFarmLogic() {
             let slotsToLock = 3 - plotsInCurrentRow - 1; 
             for (let i = 0; i < slotsToLock; i++) grid.innerHTML += `<div class="plot empty-slot"></div>`;
         } else {
-            let rowsAdded = Math.floor(window.farmPlots.length / 3) - 1;
-            let gemCost = rowsAdded >= 6 ? 30 : (rowsAdded >= 3 ? 20 : 10);
+            let rowsAdded = Math.floor(window.farmPlots.length / 3) - 1; let gemCost = rowsAdded >= 6 ? 30 : (rowsAdded >= 3 ? 20 : 10);
             grid.innerHTML += `<div class="plot empty-slot"></div><div class="plot empty-slot"></div><div class="plot empty-slot"></div>
                 <div class="plot add-plot" style="grid-column: span 3; border-color: #00E5FF; background: rgba(0,0,0,0.6);" onclick="window.buyRow(${gemCost})"><div class="plot-icon" style="color: #00E5FF;">➕</div><div class="plot-tag" style="color:#00E5FF; border-color:#00E5FF">Unlock Row: ${gemCost}💎</div></div>`;
         }
@@ -290,7 +311,6 @@ function initFarmLogic() {
     window.openModal = function(category) {
         document.getElementById('modal-title').innerText = category;
         const content = document.getElementById('modal-content'); content.innerHTML = ''; 
-
         let itemsArray = category === 'Seeds' ? Object.values(window.GAME_DB.Seeds) : window.GAME_DB[category];
 
         itemsArray.forEach(item => {
@@ -344,6 +364,8 @@ function initFarmLogic() {
                 if(window.GameData.storage >= window.GameData.maxStorage) return window.customAlert("Barn Full", "Upgrade your Barn to store more!", "error");
                 let produceId = window.GAME_DB.Seeds[plot.seedId].yields; 
                 plot.state = 'raw'; plot.seedId = null; plot.readyAt = null; window.GameData.coins += 5; 
+                
+                if (!window.GameData.inventory) window.GameData.inventory = {};
                 window.GameData.inventory[produceId] = (window.GameData.inventory[produceId] || 0) + 1; 
                 window.GameData.stats.cropsHarvested++; window.GameData.stats.totalEarnings += 5; notify("Harvested!", "success");
             } else return notify("Crop is not ready yet!", "error");
@@ -394,7 +416,7 @@ function initStorageLogic() {
     let selectedItemId = null; let selectedStackQty = 0; let transferQty = 1;
     const STACK_LIMIT = 25; 
 
-    function renderInventory() {
+    window.refreshStorage = function() {
         const grid = document.getElementById('inventory-grid');
         if(!grid) return; grid.innerHTML = ''; 
 
@@ -416,7 +438,7 @@ function initStorageLogic() {
                 }
             }
         }
-    }
+    };
 
     window.openDetails = function(id, stackQty) {
         let masterItems = { ...window.GAME_DB.Seeds, ...window.GAME_DB.Items };
@@ -444,15 +466,27 @@ function initStorageLogic() {
         document.getElementById('transfer-qty-display').innerText = transferQty;
     };
 
+    // 🔥 FIX 2: BUG-FREE TRANSFER LOGIC 🔥
     window.confirmTransfer = function() {
-        if (window.GameData.coins < 5) return window.customAlert("Not Enough Coins!", "Need 5🪙 delivery fee.", "error");
+        if (window.GameData.coins < 5) return notify("Need 5🪙 delivery fee.", "error");
+
+        // SAFETY NET: Ensure these objects exist so JavaScript doesn't crash!
+        if (!window.GameData.marketInventory) window.GameData.marketInventory = {};
+        if (!window.GameData.inventory) window.GameData.inventory = {};
+
         window.GameData.coins -= 5;
         window.GameData.inventory[selectedItemId] -= transferQty;
         window.GameData.marketInventory[selectedItemId] = (window.GameData.marketInventory[selectedItemId] || 0) + transferQty;
         
+        // Remove 0 qty item to keep save file clean and small
+        if (window.GameData.inventory[selectedItemId] <= 0) delete window.GameData.inventory[selectedItemId];
+        
         let itemName = window.GAME_DB.Seeds[selectedItemId] ? window.GAME_DB.Seeds[selectedItemId].name : window.GAME_DB.Items[selectedItemId].name;
         
-        window.saveGameData(); window.updateGlobalUI(); renderInventory();
+        window.saveGameData(); 
+        window.updateGlobalUI(); 
+        window.refreshStorage(); // Redraw UI instantly
+        
         document.getElementById('item-modal').classList.remove('show');
         notify(`Sent ${transferQty}x ${itemName} to Market! 🚚`, "success");
     };
@@ -466,9 +500,9 @@ function initStorageLogic() {
     };
 
     document.querySelectorAll('.tab-btn').forEach(tab => {
-        tab.addEventListener('click', function() { currentCategory = this.getAttribute('data-cat'); renderInventory(); });
+        tab.addEventListener('click', function() { currentCategory = this.getAttribute('data-cat'); window.refreshStorage(); });
     });
-    renderInventory();
+    window.refreshStorage();
 }
 
 // ==========================================
@@ -477,10 +511,12 @@ function initStorageLogic() {
 function initMarketLogic() {
     let currentCategory = 'crops';
 
-    function renderMarket() {
+    window.refreshMarket = function() {
         const grid = document.getElementById('market-grid');
         if(!grid) return; grid.innerHTML = '';
         let hasItems = false;
+
+        if (!window.GameData.marketInventory) window.GameData.marketInventory = {};
 
         for (let id in window.GameData.marketInventory) {
             let qty = window.GameData.marketInventory[id];
@@ -501,25 +537,29 @@ function initMarketLogic() {
             }
         }
         if (!hasItems) grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#FFECB3; padding: 20px; font-weight:bold; border: 2px dashed #4E342E; border-radius: 12px; background: rgba(0,0,0,0.3); margin-top: 20px;">🚚 Your Stall is Empty!<br><br>Transfer items from Storage.</div>`;
-    }
+    };
 
     window.sellMarketItem = function(id, qtyToSell, profit) {
+        if (!window.GameData.marketInventory) window.GameData.marketInventory = {};
+
         if(window.GameData.marketInventory[id] >= qtyToSell) {
             window.GameData.marketInventory[id] -= qtyToSell;
             window.GameData.coins += profit;
             window.GameData.stats.totalEarnings += profit; 
             
+            if (window.GameData.marketInventory[id] <= 0) delete window.GameData.marketInventory[id];
+
             let itemName = window.GAME_DB.Seeds[id] ? window.GAME_DB.Seeds[id].name : window.GAME_DB.Items[id].name;
             
-            window.saveGameData(); window.updateGlobalUI(); renderMarket();
+            window.saveGameData(); window.updateGlobalUI(); window.refreshMarket();
             notify(`Sold ${qtyToSell}x ${itemName} for ${profit}🪙!`, "success");
         }
     };
 
     document.querySelectorAll('.tab-btn').forEach(tab => {
-        tab.addEventListener('click', function() { currentCategory = this.getAttribute('data-cat'); renderMarket(); });
+        tab.addEventListener('click', function() { currentCategory = this.getAttribute('data-cat'); window.refreshMarket(); });
     });
-    renderMarket();
+    window.refreshMarket();
 }
 
 // ==========================================
@@ -567,3 +607,4 @@ function initProfileLogic() {
     }
     if(sortedItems.length === 0) invGrid.innerHTML = `<div style="grid-column: span 4; font-size:11px; color:#FFECB3;">Inventory empty! Go farm!</div>`;
 }
+
